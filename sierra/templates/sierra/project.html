@@ -45,9 +45,6 @@
                 margin-left: 10px;
                 margin-top: 10px;
             }
-            #the_search input {
-                width: 365px;
-            }
             article {
                 display: inline-block;
                 width: 400px;
@@ -63,9 +60,6 @@
             }
             article.selected {
                 border: 2px solid #930;
-            }
-            article.main {
-                margin: 0
             }
             article.main, article.nav {
                 display: block;
@@ -84,19 +78,7 @@
                 margin: 5px 0;
                 vertical-align: top;
             }
-            body {
-                padding: 0;
-            }
             
-            @media screen and (max-width: 620px) {
-                #the_sierra .text {
-                    display: none;
-                }
-                #the_search {
-                    margin-left: 0;
-                }
-            }
-
             /*
             input[type='checkbox'] {
                 -webkit-appearance:none;
@@ -113,22 +95,6 @@
         </style>
         
         <script src="https://code.jquery.com/jquery-2.1.4.js"></script> <!-- integrity="sha384-1qy6pxCPVEhkjPJM8mBaaRNIDGE20UzrPyndMEoCaeK390vhZ3jt3SQtS6aZDqRA" -->
-        
-        <script>$(function(){
-            var Q = $('form[action="/raw/create_project/"] [name="mnemo"]')
-            Q.on('focusout', function() {
-                var x = $(this).val()
-                x = x.replace(/-/g, '')
-                x = x.toUpperCase()
-                $(this).val(x)
-            })
-        })</script>
-        
-        <script>$(function(){
-            // $(document.body).on('keyup', function(ev) {
-                // alert(ev.keyCode);
-            // })
-        })</script>
     </head>
     <body>
         <article class="main">
@@ -139,52 +105,11 @@
                 --></form><!--
             --></div>
         </article>
+        
         <div id="wrapper">
         
         <article class="nav">
-        <nav>
-            <h3 class="nav">📙 Lecture</h3>
-            <a href="#list_projects">Lister tous les projets</a>
-        </nav>
-        
-        <nav>
-            <h3 class="nav">🖊️ Modification</h3>
-            <a href="#create_project">Créer un projet</a>
-            <a href="#import_from_filesystem">Importer un projet</a>
-        </nav>
-        </article>
-        
-        <article>
-        <h2>📙 Lecture</h2>
-        
-            <h3><a href="/raw/list_projects/">Lister les projets</a></h3>
-            <section>
-                <a href="/raw/list_projects/">Lister tous les projets</a>
-            </section>
-        </article>
-        
-        <article>
-        <h2>🖊️ Modification</h2>
-        
-            <h3 id="create_project">Créer un projet</h2>
-            <section>
-                <form action="/raw/create_project/" method="POST">
-                    {% csrf_token %}
-                    <p><label>Mnémonique</label> <input type="text" name="mnemo" placeholder="DEMOH101" pattern="[A-Za-z]+[0-9]+"/>
-                    <p><label>Nom</label> <input type="text" name="name" placeholder="ExamJuin" />
-                    <p><label>Inclure l'année académique</label> <input type="checkbox" name="academic_year_append" checked="checked" />
-                    <p><input type="submit" />
-                </form>
-            </section>
-        
-            <h3 id="import_from_filesystem">Importer un projet</h2>
-            <section>
-                <form action="/raw/import_from_filesystem/" method="POST">
-                    {% csrf_token %}
-                    <p><label>Nom</label> <input type="text" name="name" placeholder="PHYSS1001_ExamJuin" />
-                    <p><input type="submit" />
-                </form>
-            </section>
+            <h2>{{project.rel_path}}</h2>
         </article>
         
         </div>
