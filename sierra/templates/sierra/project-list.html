@@ -127,7 +127,27 @@
         <div id="wrapper">
         
         <article class="nav">
-            <h2>{{project.rel_path}}</h2>
+            <h3>Projets</h2>
+            <ul>
+                {% for exist, name in data %}
+                {% if exist %}
+                    <li><!--
+                    -->{% if not exist %}&#x2204;&nbsp;{% endif %}<!--
+                    --><a href="/amc/project/{{name}}">{{name}}</a>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            
+            <h3>Projets non importés</h2>
+            <ul>
+                {% for exist, name in data %}
+                {% if not exist %}
+                    <li><!--
+                    -->{% if not exist %}&#x2204;&nbsp;{% endif %}<!--
+                    --><a href="/amc/project/{{name}}">{{name}}</a>
+                {% endif %}
+                {% endfor %}
+            </ul>
         </article>
         
         </div>

@@ -139,6 +139,8 @@ def list_projects(request):
         for path in filter(Path.is_dir, AmcProject.root_path.iterdir())
         for rel_path in [ str(path.relative_to(AmcProject.root_path)) ])
     
+    return render(request, A('project-list.html'), {'data':data})
+    
     return HttpResponse(QuickHtml.base_links(QuickHtml.enclose('<ul>', '<br/>'.join(
         QuickHtml.enclose('<li>', '{0}<a href="/amc/project/{1}">{1}</a>'.format('&#x2204;&nbsp;' * (not exists), name))
         for exists, name in data
