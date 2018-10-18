@@ -123,16 +123,182 @@
                 $(this).val(x)
             })
         })</script>
+        <script>$(function(){
+            $('.nav nav a').each(function(){
+                var h = $(this).attr('href');
+                if(h[0] == '#') {
+                    var r = h.slice(1);
+                    var t = document.getElementById(r)
+                    $(this).click(function(ev){
+                        var firstParentThatIsArticle = (function(){
+                            for(var x = t.parentNode; x; x = x.parentNode)
+                                if(x.nodeName == "ARTICLE")
+                                    return x
+                            return null
+                        })();
+                        
+                        var allSiblingArticle = (function(){
+                            var L = []
+                            for(var x = firstParentThatIsArticle.parentNode.firstChild; x; x = x.nextSibling)
+                                if(x && x.nodeName == "ARTICLE"
+                                    && ! $(x).hasClass('nav')
+                                    && x != firstParentThatIsArticle)
+                                    L.push(x)
+                            return L
+                        })();
+                        
+                        $(allSiblingArticle).hide();
+                        $(firstParentThatIsArticle).show();
+                        // IDEA: instead of hide/show, put block first
+                        
+                        ev.preventDefault();
+                        
+                        // TODO: move section to the top and highlight
+                    })
+                }
+            })
+        })</script>
         
         <script>$(function(){
             // $(document.body).on('keyup', function(ev) {
                 // alert(ev.keyCode);
             // })
         })</script>
+        
+        <script>$(function(){
+            $('#the_search').val('')
+        })</script>
+        
+        <script>$(function(){
+            /* $("#the_search").on('keydown', function(ev) {
+                console.log("down", '@' + (new Date().getSeconds()), ev.keyCode, ev);
+            })
+            $("#the_search").on('keyup', function(ev) {
+                console.log("up", '@' + (new Date().getSeconds()), ev.keyCode, ev);
+            }) */
+            
+            function firstParentBeing_Of_(tag, x) {
+                for(var elem = x.parentElement; elem; elem = elem.parentElement)
+                    if(tag.toUpperCase() == elem.tagName.toUpperCase())
+                        return elem 
+                return null
+            }
+            
+            function RegExpEscape(s) {  // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+                return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            }
+            
+            /**
+             !!match('hello', 'hel') == true
+             !!match('hello', 'hal') == false
+            */
+            function match(x,y) {
+                var doesMatch = !!(new RegExp(RegExpEscape(y), 'i')).exec(x)
+                if(! doesMatch)
+                    return null
+                
+                var inputString = x;
+                // javascript doesnt't have a fine grained regex module like, say, python
+                // implementing the algorithm myself
+                x = x.toLowerCase(); // doesn't change the spans
+                y = y.toLowerCase(); // doesn't change the spans
+                var spans = []
+                for(var i = 0; i < x.length; i++) {
+                    // if(all(x[i+j] == y[j] for j in range(y.length)))
+                    //    spans.push([i, i + y.length])
+                    
+                    var ok = true;
+                    for(var j = 0; j < y.length; j++) {
+                        if(x[i+j] != y[j]) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    
+                    if(ok)
+                        spans.push([i, i + y.length])
+                }
+                
+                return {
+                    spans: spans,  // match iff spans.length > 0
+                    highlighted: function(begin, end) {
+                        var bits = []
+                        var x = 0
+                        for(let span of spans) {
+                            var [a, b] = span
+                            bits.push(inputString.slice(x, a))
+                            bits.push(begin + inputString.slice(a, b) + end)
+                            x = b;
+                        }
+                        console.log(inputString, '\n->', bits.join(''))
+                        return bits.join('')
+                    }
+                }
+            }
+            
+            // init
+            var LH3 = document.querySelectorAll('h3:not(.nav)')
+            
+            // for(h3 of LH3) // TODO: remove comments in that test
+            //  assert h3.children.length == 0
+            //  assert h3.childNodes.length == 1
+            //  assert h3.childNodes[0].nodeType == TEXT_NODE
+                
+            var block_of = new Map()
+            for(let h3 of LH3)
+                if(h3.nextElementSibling && h3.nextElementSibling.tagName.toLowerCase() == 'section')
+                    block_of.set(h3, h3.nextElementSibling)
+                    
+            var parent_of = new Map()
+            for(let h3 of LH3) 
+                parent_of.set(h3, firstParentBeing_Of_('article', h3))
+                
+            var LS = []
+            for(let h3 of LH3)
+                LS.push(h3)
+            for(let y of block_of.values())
+                if(y)
+                    LS.push(y)
+            for(let y of parent_of.values())
+                if(y)
+                    LS.push(y)
+            
+            console.log('\nLS', LS, '\nLH3', LH3, '\nparent_of', parent_of, '\nblock_of', block_of)
+            
+            // default setup save
+            for(let h3 of LH3)
+                $(h3).data('init-text', $(h3).html())
+            
+            // events
+            $("#the_search").on('keyup', function(ev) {
+                var s = $(ev.target).val().trim()
+                if(s == '') {
+                    $(LS).show()
+                    for(let h3 of LH3)
+                        $(h3).html($(h3).data('init-text'))
+                } else {
+                    $(LS).hide()
+                    
+                    for(let h3 of LH3)
+                        $(h3).html($(h3).data('init-text'))
+                    
+                    for(let h3 of LH3) {
+                        var matcher = match($(h3).data('init-text'), s);
+                        if(matcher) {
+                            $(h3).show()
+                            // $(h3).html(matcher.highlighted('<mark class="highlight">', '</mark>'))
+                            $(h3).html('<mark>' + $(h3).data('init-text') + '</mark>')
+                            $(parent_of.get(h3) || []).show()
+                            $(block_of.get(h3) || []).show()
+                        } 
+                    }
+                }
+            })
+        })</script>
     </head>
     <body>
         <article class="main">
-            <h1 id="the_sierra"><span class="emoji">😃</span> <span class="text">Sierra</span></h1><!--
+            <h1 id="the_sierra"><a href="/" class="emoji">😃</a> <span class="text">Sierra</span></h1><!--
             --><div id="the_search"><!--
                 --><form><!--
                     --><input type="text" autofocus="autofocus" /><!--
@@ -157,7 +323,7 @@
         <article>
         <h2>📙 Lecture</h2>
         
-            <h3><a href="/raw/list_projects/">Lister les projets</a></h3>
+            <h3 id="list_projects"><a href="/raw/list_projects/">Lister les projets</a></h3>
             <section>
                 <a href="/raw/list_projects/">Lister tous les projets</a>
             </section>

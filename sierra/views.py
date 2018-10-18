@@ -150,6 +150,9 @@ def project_detail(request, likeid):
     assert request.method == 'GET'
     
     project = AmcProject.objects.get(rel_path=likeid)
+    # [n.parts[-1] for n in (project.abs_path / 'data').iterdir()]
+    
+    # raise ''
     
     return render(request, A('project.html'), {
         'project': project

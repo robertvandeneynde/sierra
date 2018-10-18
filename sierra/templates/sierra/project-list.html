@@ -116,7 +116,7 @@
     </head>
     <body>
         <article class="main">
-            <h1 id="the_sierra"><span class="emoji">😃</span> <span class="text">Sierra</span></h1><!--
+            <h1 id="the_sierra"><a href="/" class="emoji">😃</a> <span class="text">Sierra</span></h1><!--
             --><div id="the_search"><!--
                 --><form><!--
                     --><input type="text" autofocus="autofocus" /><!--
@@ -127,7 +127,7 @@
         <div id="wrapper">
         
         <article class="nav">
-            <h3>Projets</h2>
+            <h3>Projets</h3>
             <ul>
                 {% for exist, name in data %}
                 {% if exist %}
@@ -138,13 +138,19 @@
                 {% endfor %}
             </ul>
             
-            <h3>Projets non importés</h2>
+            <h3>Projets non importés</h3>
             <ul>
                 {% for exist, name in data %}
                 {% if not exist %}
                     <li><!--
                     -->{% if not exist %}&#x2204;&nbsp;{% endif %}<!--
-                    --><a href="/amc/project/{{name}}">{{name}}</a>
+                    --><a style="min-width:150px;display:inline-block" href="/amc/project/{{name}}">{{name}}</a>
+                    
+                    <form style="display:inline" action="/raw/import_from_filesystem/" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="name" value="{{name}}" />
+                        <input type="submit" value="Importer" />
+                    </form>
                 {% endif %}
                 {% endfor %}
             </ul>
