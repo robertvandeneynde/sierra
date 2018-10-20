@@ -3,3 +3,4 @@
 __pycache__
 db.sqlite3
 .kateproject
+local_settings.py

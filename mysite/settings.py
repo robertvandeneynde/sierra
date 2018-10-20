@@ -10,6 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -118,3 +123,11 @@ STATIC_URL = '/static/'
 # AMC (auto-mulitple-choice)
 # http://auto-multiple-choice.net/
 AMC_BASE_PATH = '/home/robert/amc/'
+AMC_BASE_PATH = (r'D:\Users\Administrateur'
+                 + r'\OneDrive\OneDrive - Université Libre de Bruxelles'
+                 + r'\Dossier ULB\Assistanat\2018-2019\sierraAMC')
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
