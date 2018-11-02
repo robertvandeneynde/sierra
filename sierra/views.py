@@ -29,7 +29,9 @@ def app_local_file(*filenames):
 def hello(request):
     return HttpResponse('Tadaa')
 
-def world(request):
+# first views
+
+def homepage(request):
     return render(request, A('index.html'))
 
 # utils
@@ -78,7 +80,9 @@ def create_project(request):
     academic_year_append = R.get('academic_year_append', False)
     
     if academic_year_append:
-        name += '_' + (lambda x: f'{x}-{x+1}')(x=timezone.now().year)
+        N = timezone.now()
+        x = N.year if (N.month, N.day) >= (9, 1) else N.year - 1
+        name = name + '_' + f'{x}-{x+1}'
     
     if mnemo:
         name = mnemo + '_' + name
@@ -157,7 +161,28 @@ def project_detail(request, likeid):
     return render(request, A('project.html'), {
         'project': project
     })
+
+def project_upload_source(request):
+    assert request.method == 'POST'
     
+    R = request.POST
+    
+    if "project_likeid" in R:
+        project = AmcProject.get_by_likeid(R["project_likeid"])
+    else:
+        project = AmcProject.objects.get(id=R["project_id"])
+    
+    if 'source' not in request.FILES:
+        return Http400("400")
+    
+    if project.has_source():
+        pass  # chill
+    
+    with open(project.abs_path / 'source.tex', 'wb') as f:
+        f.write(request.FILES['source'].read())
+    
+    return HttpResponse('Ok')
+
 def amc_prepare(request):
     
     return HttpResponse('Ok')

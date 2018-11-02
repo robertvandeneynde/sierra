@@ -110,6 +110,11 @@
                 background: #c30;
             }
             */
+            
+            .info {
+                font-variant: italics;
+                font-size: 75%;
+            }
         </style>
         
         <script src="https://code.jquery.com/jquery-2.1.4.js"></script> <!-- integrity="sha384-1qy6pxCPVEhkjPJM8mBaaRNIDGE20UzrPyndMEoCaeK390vhZ3jt3SQtS6aZDqRA" -->
@@ -301,7 +306,9 @@
             <h1 id="the_sierra"><a href="/" class="emoji">😃</a> <span class="text">Sierra</span></h1><!--
             --><div id="the_search"><!--
                 --><form><!--
-                    --><input type="text" autofocus="autofocus" /><!--
+                    --><input type="search" autofocus="autofocus"
+                        placeholder="Entrez une action, comme « créer projet »"
+                    /><!--
                 --></form><!--
             --></div>
         </article>
@@ -309,7 +316,7 @@
         
         <article class="nav">
         <nav>
-            <h3 class="nav">📙 Lecture</h3>
+            <h3 class="nav">📙 Lecture</h3>
             <a href="#list_projects">Lister tous les projets</a>
         </nav>
         
@@ -330,9 +337,9 @@
         </article>
         
         <article>
-        <h2>🖊️ Modification</h2>
+        <h2>🖊️ Modification &ndash; Liste</h2>
         
-            <h3 id="create_project">Créer un projet</h2>
+            <h3 id="create_project">Créer un projet</h3>
             <section>
                 <form action="/raw/create_project/" method="POST">
                     {% csrf_token %}
@@ -343,12 +350,27 @@
                 </form>
             </section>
         
-            <h3 id="import_from_filesystem">Importer un projet</h2>
+            <h3 id="import_from_filesystem">Importer un projet</h3>
+            <p class="info">If you are running sierra in local or you have ssh or scp access to the server</p>
             <section>
                 <form action="/raw/import_from_filesystem/" method="POST">
                     {% csrf_token %}
                     <p><label>Nom</label> <input type="text" name="name" placeholder="PHYSS1001_ExamJuin" />
                     <p><input type="submit" />
+                </form>
+            </section>
+        </article>
+        
+        <article>
+        <h2>🖊️ Modification &ndash; Projet</h2>
+        
+            <h3>Uploader la source .tex</h3>
+            <section>
+                <form action="/raw/upload_source/" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <p><label>Projet</label> <input name="project_likeid"></p>
+                    <p><input type="file" name="source"></p>
+                    <p><input type="submit"/>
                 </form>
             </section>
         </article>

@@ -119,7 +119,7 @@
             <h1 id="the_sierra"><a href="/" class="emoji">😃</a> <span class="text">Sierra</span></h1><!--
             --><div id="the_search"><!--
                 --><form><!--
-                    --><input type="text" autofocus="autofocus" /><!--
+                    --><input type="search" autofocus="autofocus" /><!--
                 --></form><!--
             --></div>
         </article>
@@ -132,8 +132,8 @@
                 {% for exist, name in data %}
                 {% if exist %}
                     <li><!--
-                    -->{% if not exist %}&#x2204;&nbsp;{% endif %}<!--
-                    --><a href="/amc/project/{{name}}">{{name}}</a>
+                    -->{% if not exist %}∄ {% endif %}<!-- U+2204 ∄ THERE DOES NOT EXIST
+                    --><a href="/project/{{name}}/">{{name}}</a>
                 {% endif %}
                 {% endfor %}
             </ul>
@@ -154,6 +154,17 @@
                 {% endif %}
                 {% endfor %}
             </ul>
+            
+        </article>
+        
+        <article>
+            <h3>Importer un projet externe</h3>
+            <p class="info">...hors du dossier amc qui a été mis dans <code>settings.py</code></p>
+            <form style="display:inline" action="/raw/import_from_filesystem/" method="POST">
+                {% csrf_token %}
+                <p><label>Absolute filename</label> <input name="name" />
+                <p><input type="submit" value="Importer" />
+            </form>
         </article>
         
         </div>
