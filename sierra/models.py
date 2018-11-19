@@ -14,6 +14,7 @@ def FK(*args, **kwargs):
 class AmcProject(Model):
     # Fields
     rel_path = CharField(max_length=100, unique=True)  # if not startswith('/'): relative to settings.AMC_BASE_PATH
+    #does_compile = BooleanField(default=False)
     
     # Class attributes
     root_path = Path(settings.AMC_BASE_PATH)
@@ -44,6 +45,9 @@ class AmcProject(Model):
     
     def has_source(self) -> bool:
         return (self.abs_path / 'source.tex').is_file()
+    
+    def does_compile(self) -> bool:
+        return (self.abs_path / 'subject.pdf').is_file()
     
     def source_stat(self):
         import os

@@ -162,6 +162,68 @@ def project_detail(request, likeid):
         'project': project
     })
 
+def compile_project(project):
+    import subprocess
+    from subprocess import PIPE, STDOUT
+    r = subprocess.check_output([
+        'auto-multiple-choice',
+        'prepare', 
+        '--mode', 's',
+        '--out-sujet', 'subject.pdf',
+        'source.tex',
+    ], cwd=project.abs_path, stderr=STDOUT)
+    
+    # here no exception
+    # project.does_compile = True
+    # project.save()
+    return HttpResponse(QuickHtml.enclose('<pre>',  r.decode('utf-8', 'replace')))
+
+def project_upload_scans(request):
+    assert request.method == 'POST'
+    
+    R = request.POST
+    
+    if "project_likeid" in R:
+        project = AmcProject.get_by_likeid(R["project_likeid"])
+    else:
+        project = AmcProject.objects.get(id=R["project_id"])
+    
+    scans = project.abs_path / 'scans'
+    scans.mkdir(exist_ok=True)
+    
+    import itertools
+    it = itertools.count(1)
+    
+    from os.path import splitext
+    
+    now = timezone.now().strftime('%Y-%m-%dT%H:%M:%S')
+    
+    uploaded = []
+    for f in request.FILES.getlist('scans'):
+        ext = splitext(f.name)[-1].lower()
+        new_file = scans / '{}_{}{}'.format(now, next(it), ext) 
+        assert not new_file.exists()
+        with open(new_file, 'wb') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        uploaded.append(new_file)
+    
+    import subprocess
+    from subprocess import PIPE, STDOUT
+    r = subprocess.check_output([
+        'auto-multiple-choice',
+        'analyse', 
+        # '--seuil-coche', '0.6',  # read from options.xml for compability with GUI
+        '--projet', str(project.abs_path),
+        *(str(u.absolute()) for u in uploaded)
+    ], cwd=project.abs_path, stderr=STDOUT)
+    
+    # each line is in +///+ notation
+    # if the scan is not good, it will be in the sqlite (capture_failed table, containing capture_failed.filename with %PROJET)
+    # else, it will be in capture_page table, with src startswith '%PROJET/' (student, page, copy)
+    
+    return HttpResponse(QuickHtml.enclose('<pre>',  r.decode('utf-8', 'replace')))
+
 def project_upload_source(request):
     assert request.method == 'POST'
     
@@ -180,9 +242,7 @@ def project_upload_source(request):
     
     with open(project.abs_path / 'source.tex', 'wb') as f:
         f.write(request.FILES['source'].read())
-    
-    return HttpResponse('Ok')
-
-def amc_prepare(request):
+        
+    return compile_project(project)
     
     return HttpResponse('Ok')

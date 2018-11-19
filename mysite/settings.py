@@ -117,4 +117,4 @@ STATIC_URL = '/static/'
 
 # AMC (auto-mulitple-choice)
 # http://auto-multiple-choice.net/
-AMC_BASE_PATH = '/home/robert/amc/'
+AMC_BASE_PATH = os.path.expanduser('~/amc')

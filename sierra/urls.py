@@ -16,7 +16,7 @@ urlpatterns = [
     path('raw/import_from_filesystem/', views.import_from_filesystem),
     
     path('raw/project/upload_source/', views.project_upload_source),
-    # path('raw/project/upload_scans/', views.project_upload_scans),
+    path('raw/project/upload_scans/', views.project_upload_scans),
     
     path('project/<likeid>/', views.project_detail),
 ]

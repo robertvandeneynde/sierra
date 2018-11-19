@@ -96,6 +96,9 @@
                     margin-left: 0;
                 }
             }
+            .info {
+                font-style: italic;
+            }
 
             /*
             input[type='checkbox'] {
@@ -131,6 +134,11 @@
             {# <h4>Fichiers</h4> #}
             {% if project.has_source %}
                 <p><code>source.tex</code> {{ project.source_stat }}</p>
+                {% if project.does_compile %}
+                Compilation succeeded, here is a link to [the pdf](subject.pdf)
+                {% else %}
+                Your file does not compile, click here to see the latex log.
+                {% endif %}
             {% else %}
                 <p>No source yet, upload it !</p>
             {% endif %}
@@ -147,6 +155,19 @@
                     <input type="submit"/>
                 </form>
             </section>
+            <h3>📙 Voir la source</h3>
+            <section>
+                <p class="info">À l'occaz</p>
+            </section>
+            <h3>🖊️ Modifer la source</h3>
+            <section>   
+                <p class="info">À l'occaz</p>
+            </section>
+            <h3>→ Uploader un pdf</h3>
+            <p>Un pdf avec des marges vides sera annoté pour être lu de manière informatisée.</p>
+            <section>   
+                <p class="info">Bientôt !</p>
+            </section>
         </article>
         
         <article>
@@ -155,7 +176,7 @@
             <section>
                 <form action="/raw/project/upload_scans/" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <p><input type="file" multiple></p>
+                    <p><input name="scans" type="file" multiple></p>
                     <input type="hidden" name="project_id" value="{{project.id}}"/>
                     <input type="submit"/>
                 </form>
