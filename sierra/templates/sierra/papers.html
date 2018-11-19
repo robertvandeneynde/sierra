@@ -99,6 +99,13 @@
             .info {
                 font-style: italic;
             }
+            table {
+                border-collapse: collapse;
+            }
+            table td, table th {
+                border: 1px solid #ccc;
+                padding: 2px;
+            }
             /*
             input[type='checkbox'] {
                 -webkit-appearance:none;
@@ -130,71 +137,19 @@
         
         <article class="nav">
             <h2>{{project.rel_path}}</h2>
-            {# <h4>Fichiers</h4> #}
-            {% if project.has_source %}
-                <p><code>source.tex</code> {{ project.source_stat }}</p>
-                {% if project.does_compile %}
-                Compilation succeeded, here is a link to [the pdf](subject.pdf)
-                {% else %}
-                Your file does not compile, click here to see the latex log.
-                {% endif %}
-            {% else %}
-                <p>No source yet, upload it !</p>
-            {% endif %}
+           
+            <h3>Copies mal reconnues</h3>
+            <p><strong>{{ page_failed |length }}</strong> copie{{ page_failed |length |pluralize:",s"}} mal reconnue{{ page_failed |length |pluralize:",s"}}.</p>
             
             <h3>Informations sur les copies</h3>
-            <p><strong>{{ page_infos |length }}</strong> copie(s) dans ce projet, cliquez <a href="/project/{{ project.rel_path }}/papers">ici</a>.</p>
-        </article>
+            <p><strong>{{ page_infos |length }}</strong> copie{{ page_infos |length |pluralize:",s"}} dans ce projet :</p>
         
-        <article>
-            <h2>→ Préparation</h2>
-            <h3>🖊️ Uploader la source (.tex)</h3>
-            <section>
-                <form action="/raw/project/upload_source/" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <p><input name="source" type="file"></p>
-                    <input type="hidden" name="project_id" value="{{project.id}}"/>
-                    <input type="submit"/>
-                </form>
-            </section>
-            
-            <h3>→ Uploader un pdf</h3>
-            <p>Un pdf avec des marges vides sera annoté pour être lu de manière informatisée.</p>
-            <section>   
-                <p class="info">Bientôt !</p>
-            </section>
-            
-            <h3>📙 Voir la source</h3>
-            <section>
-                <p class="info">À l'occaz</p>
-            </section>
-            <h3>🖊️ Modifer la source</h3>
-            <section>   
-                <p class="info">À l'occaz</p>
-            </section>
-        </article>
-        
-        <article>
-            <h2>→ Scans corrigés</h2>
-            <h3>🖊️ Uploader des scans</h3>
-            <section>
-                <form action="/raw/project/upload_scans/" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <p><input name="scans" type="file" multiple></p>
-                    <input type="hidden" name="project_id" value="{{project.id}}"/>
-                    <input type="submit"/>
-                </form>
-            </section>
-        </article>
-        
-        <article>
-            <h2>→ Scans non corrigés</h2>
-            <p class="info">Après bientôt</p>
-        </article>
-        
-        <article>
-            <h2>→ Informations</h2>
-            <p><a href="/project/{{ project.rel_path }}/papers">Voir la liste des copies</a></p>
+            <table>
+                <tr><th>a</th><th>b</th><th>c</th></tr>
+            {% for a,b,c in page_infos %}
+                <tr><td>{{ a }}</td><td>{{ b }}</td><td>{{ c }}</td></tr>
+            {% endfor %}
+            </table>
         </article>
         
         </div>

@@ -158,8 +158,27 @@ def project_detail(request, likeid):
     
     # raise ''
     
+    import sqlite3
+    conn = sqlite3.connect(str((project.abs_path / 'data' / 'capture.sqlite').absolute()))
+    page_infos = conn.execute('select student, page, copy from capture_page order by student, page, copy').fetchall()
+    
     return render(request, A('project.html'), {
-        'project': project
+        'project': project,
+        'page_infos': page_infos,
+    })
+
+def project_list_papers(request, likeid):
+    assert request.method == 'GET'
+    
+    project = AmcProject.objects.get(rel_path=likeid)
+    
+    import sqlite3
+    conn = sqlite3.connect(str((project.abs_path / 'data' / 'capture.sqlite').absolute()))
+    
+    return render(request, A('papers.html'), {
+        'project': project,
+        'page_infos': conn.execute('select student, page, copy from capture_page order by student, page, copy').fetchall(),
+        'page_failed': conn.execute('select filename from capture_failed order by timestamp').fetchall(),
     })
 
 def compile_project(project):

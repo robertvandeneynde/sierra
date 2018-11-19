@@ -19,4 +19,5 @@ urlpatterns = [
     path('raw/project/upload_scans/', views.project_upload_scans),
     
     path('project/<likeid>/', views.project_detail),
+    path('project/<likeid>/papers', views.project_list_papers),
 ]
