@@ -122,6 +122,7 @@ STATIC_URL = '/static/'
 
 # AMC (auto-mulitple-choice)
 # http://auto-multiple-choice.net/
+<<<<<<< HEAD
 AMC_BASE_PATH = '/home/robert/amc/'
 AMC_BASE_PATH = (r'D:\Users\Administrateur'
                  + r'\OneDrive\OneDrive - Université Libre de Bruxelles'
@@ -131,3 +132,6 @@ try:
     from local_settings import *
 except ImportError:
     pass
+=======
+AMC_BASE_PATH = os.path.expanduser('~/amc')
+>>>>>>> 91e096c21966379de89b65ec447381c38582d8d5

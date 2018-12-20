@@ -59,7 +59,7 @@ Regards.</email_text>
   <regroupement_type>STUDENTS</regroupement_type>
   <seuil>0.15</seuil>
   <seuil_up>1</seuil_up>
-  <texsrc>%PROJET/bareme.tex</texsrc>
+  <texsrc>%PROJET/source.tex</texsrc>
   <verdict>%(ID)
 Mark: %s/%m (total score: %S/%M)</verdict>
   <verdict_q>&quot;%s/%m&quot;</verdict_q>
