@@ -1,0 +1,789 @@
+%%%%%%%%%
+%%%%%%%%% Définitions diverses et réglage du style d'affichage des questions
+%%%%%%%%%
+
+
+% Obtenir le numéro de copie
+\makeatletter
+\def\Nsujet{\the\AMCid@etud}
+\makeatother
+
+
+% Définition de la commande pour créer une nouvelle page avec un QR code dans le coin supérieur droit
+\def\newpageqr{
+				\newpage
+				\placetextbox{0.685}{0.975}{Page \arabic{page} de \framebox{\nserie}}
+				\placetextbox{0.80}{0.975}{\qrcode[height=0.75in]{\versionSierra /\mnemo /\anneeacad/\epreuve /\nserie /\Nsujet /\arabic{page}}}	
+				}
+				
+
+
+% Définir automatiquement le syllabus dont sont issues les questions (en fonction de \mnemo) 
+\ifthenelse{\equal{\mnemo}{\inge}}{\def\sylla{INGE}}{\def\sylla{IRCI}}
+
+%% Désactiver l'affichage automatique du numéro de la question
+\def\AMCbeginQuestion#1#2{\par\noindent \\\vspace{0.2cm}}
+
+%% Retirer les labels des cases à cocher 
+\def\AMCchoiceLabel#1{}
+
+%% Changer la forme et la dimension des cases à cocher
+\AMCboxStyle{shape=square,size=2.ex,down=.2ex} 
+
+%% "Boîtes à compléter" avec la réponse numérique au dessus des cases à cocher des digits
+\def\boxdigits{
+\framebox(11,15){} \hspace{0.26cm} \framebox(11,15){} \hspace{-0.02cm}, \hspace{-0.13cm} \framebox(11,15){} \hspace{0.03cm} \framebox(11,15){} \hspace{-0.1cm} E
+}
+
+%% "Boîtes à compléter" avec la réponse numérique au dessus des cases à cocher des questions de numération
+\def\boxnum{
+\hspace{-0.15cm}\framebox(9,15){} \hspace{-0.03cm} \framebox(9,15){}  \hspace{-0.03cm} \framebox(9,15){} \hspace{-0.03cm} \framebox(9,15){} \hspace{-0.03cm} \framebox(9,15){} \hspace{-0.03cm} \framebox(9,15){}
+}
+
+%% "Boîtes à compléter" avec la réponse numérique au dessus des cases à cocher de l'exposant
+\def\boxexp{
+\framebox(11,15){} \hspace{0.2cm} \framebox(11,15){}
+}
+
+% DEF : Couleur de background de la zone d'encodage des points des questions ouvertes AMC
+\AMCopenOpts{backgroundcol=white}
+
+
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \pageqo pour la génération d'une page contenant deux questions ouvertes (QO) avec encodage
+%%%%%%%%% 
+% Cette commande accepte trois paramètres :
+% 1) le numéro de la page du pdf original de l'examen à inclure et à décorer avec les grilles d'encodage
+% 2) le numéro de la première QO sur la page
+% 3) le numéro de la seconde QO sur la page
+% Ex : \pageqo{2}{1}{2} inclut la page 2 du pdf \pdfexam et la décore avec des grilles d'encodage (de point et d'annotation) pour les QO "QO1" et "QO2".
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{pageqo}{pdf}{\def\pageqo@pdf{#1}}
+\define@key{pageqo}{pagepdf}{\def\pageqo@pagepdf{#1}}
+\define@key{pageqo}{numqa}{\def\pageqo@numqa{#1}}
+\define@key{pageqo}{numqb}{\def\pageqo@numqb{#1}}
+\define@key{pageqo}{gauche}{\def\pageqo@gauche{#1}}
+\define@key{pageqo}{bas}{\def\pageqo@bas{#1}}
+\define@key{pageqo}{droite}{\def\pageqo@droite{#1}}
+\define@key{pageqo}{haut}{\def\pageqo@haut{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{pageqo}{
+	pdf={\pdfexam},
+	pagepdf=1,
+	numqa=1,
+	numqb=2,
+	gauche={1},
+	bas={-4},
+	droite={0},
+	haut={-1}}
+\newcommand{\pageqo}[1][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+	\newpageqr
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{pageqo}{#1}
+	\includepdf[
+		pagecommand={
+			\begin{minipage}{0.3\textwidth}		
+				\vspace*{2.7cm}
+				\hspace{-2.7cm}	
+%				\insertgroup[1]{QANN#2}
+				\QANNOTATEsimple[]{QANN\pageqo@numqa}{QANN\pageqo@numqa}
+			\end{minipage}
+			\begin{minipage}{\textwidth}		
+				\vspace*{3.2cm}
+				\hspace{10.5cm}	
+%				\insertgroup[1]{QO#2}
+				\QOsimple[]{QO\pageqo@numqa}{QO\pageqo@numqa}
+			\end{minipage}
+			\begin{minipage}{0.3\textwidth}		
+				\vspace*{2.7cm}
+				\hspace{-2.15cm}	
+%				\insertgroup[1]{QANN#3}
+				\QANNOTATEsimple[]{QANN\pageqo@numqb}{QANN\pageqo@numqb}
+			\end{minipage}
+			\begin{minipage}{\textwidth}	
+				\AMCboxStyle{shape=oval,size=2ex,down=.4ex,rule=.5pt,outsidesep=-0.5cm,color=black}
+				\vspace{3cm}
+				\hspace{11.05cm}
+%				\insertgroup[1]{QO#3}
+				\QOsimple[]{QO\pageqo@numqb}{QO\pageqo@numqb}
+			\end{minipage}
+			\placetextbox{0.685}{0.975}{Page \arabic{page} de \framebox{\nserie}}
+		},
+		pages={\pageqo@pagepdf}, 
+%		trim=#2cm #3cm #4cm #5cm]{\pdfexam} %gauche bas droite haut
+		trim=\pageqo@gauche cm \pageqo@bas cm \pageqo@droite cm \pageqo@haut cm]{\pageqo@pdf} %gauche bas droite haut
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother	
+
+
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \qcrec pour la génération de la question bonus "lettres grecques"
+%%%%%%%%% 
+% Cette commande accepte deux paramètres :
+% - le nom de la question (qui sera affiché sur la  page en gras). Ex : "Question 10 (bonus)"
+% - les lectures des lettres grecques à placer au dessus de la grille (les lettres à "identifier"). Il faut les écrire séparées par des virgules
+%   Ex : "alpha, beta, gamma" 
+% Ex : \qgrec{Question 10 (bonus)}{alpha, beta, gamma, eta, xi, zeta}
+
+\newcommand{\qgrec}[2]{
+	\noindent\textbf{#1}\\
+	Pour chaque lettre grecque, noircissez la case de la grille qui se trouve à l’intersection de la
+	ligne et de la colonne correspondant à ses représentations phonétique et symbolique (il est
+	impératif de ne noircir qu’une seule case par lettre).
+	
+	%% Définition bonnes réponses
+	\newcommand{\lecturescorrectes}{#2}	
+	%% Définition lectures des lettres à écrire à gauche de la grille d'encodage
+	\newcommand{\lecturesgrecquesverticales}{sigma, epsilon, tau, lambda, alpha, phi, gamma, kappa, khi, rho, \textit{autre}}
+
+	%% Lettres grecques au dessus de la grille d'encodage
+	\hspace{4.95cm}\foreach \n in \lecturescorrectes {\hspace{0.24cm} \normalsize $\csname\n\endcsname$}\vspace{-0.9cm}
+
+	\hspace{1.5cm}
+	\begin{minipage}{0.2\linewidth}
+		% Placer lectures à gauche de la grille
+		\vspace{12pt}
+		\begin{flushright}
+			\foreach \n in \lecturesgrecquesverticales{\vspace{4.1pt}\n\par}
+		\end{flushright}
+	\end{minipage}
+	\hspace{-0.5cm}
+	\foreach \n in \lecturescorrectes{	
+		\begin{minipage}{0.2\linewidth}
+			\begin{questionmult}{qgrec_\n}\bareme{haut=1, m=-10, e=0, p=0}
+			  \AMCtext{none}{} % Retirer (localement) le texte "Aucune de ces réponses n'est correcte"
+			  \begin{reponses}[o]
+			  	\ifthenelse{\equal{\n}{sigma}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{epsilon}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{tau}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{lambda}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{alpha}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{phi}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{gamma}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{kappa}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{khi}}{\bonne{}}{\mauvaise{}}
+			  	\ifthenelse{\equal{\n}{rho}}{\bonne{}}{\mauvaise{}}
+			  \end{reponses}
+			\end{questionmult}
+		\end{minipage}
+		\hspace{-3.2cm}
+	}
+}
+
+%\AMCtext{none}{Bloup}
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QOamc
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QOamc}{num}{\def\qoamc@num{#1}}
+\define@key{QOamc}{lettre}{\def\qoamc@lettre{#1}}
+\define@key{QOamc}{enonce}{\def\qoamc@enonce{#1}}
+\define@key{QOamc}{points}{\def\qoamc@points{#1}}
+\define@key{QOamc}{largeur}{\def\qoamc@largeur{#1}}
+\define@key{QOamc}{hauteur}{\def\qoamc@hauteur{#1}}
+\define@key{QOamc}{contenu}{\def\qoamc@contenu{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QOamc}{
+	num=0,
+	lettre=0,
+	enonce={\noindent Réservé au\\correcteur},
+	points=3,
+	largeur={.95\linewidth},
+	hauteur=1.5cm,
+	contenu=None}
+\newcommand{\QOamc}[2][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QOamc}{#1}
+	\begin{question}{#2}
+	  \def\qoamc@cont{\begin{minipage}[t][\qoamc@hauteur][c]{\qoamc@largeur} \hspace{0.2cm}\ifthenelse{\equal{\qoamc@contenu}{None}}{}{\qoamc@contenu} \end{minipage}}
+	  \textbf{\qoamc@num.\qoamc@lettre)} \qoamc@enonce
+	  \AMCOpen{dots=false, contentcommand=qoamc@cont}{
+	  		\foreach \i in {0,...,\number\numexpr\qoamc@points-1\relax} {
+	  			\wrongchoice[\i]{\i}\scoring{\i}
+	  			}
+	  		\correctchoice[\qoamc@points]{\qoamc@points}\scoring{\qoamc@points}
+	  		}
+	\end{question}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother
+
+
+%%%%%%%%%% 
+%%%%%%%%%% Définition de la commande \Qtiroir
+%%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{Qtiroir}{num}{\def\qtiroir@num{#1}}
+\define@key{Qtiroir}{figure}{\def\qtiroir@figure{#1}}
+\define@key{Qtiroir}{enonce}{\def\qtiroir@enonce{#1}}
+\define@key{Qtiroir}{enoncea}{\def\qtiroir@enoncea{#1}}
+\define@key{Qtiroir}{enonceb}{\def\qtiroir@enonceb{#1}}
+\define@key{Qtiroir}{pointsa}{\def\qtiroir@pointsa{#1}}
+\define@key{Qtiroir}{pointsb}{\def\qtiroir@pointsb{#1}}
+\define@key{Qtiroir}{hauteura}{\def\qtiroir@hauteura{#1}}
+\define@key{Qtiroir}{hauteurb}{\def\qtiroir@hauteurb{#1}}
+\define@key{Qtiroir}{largeura}{\def\qtiroir@largeura{#1}}
+\define@key{Qtiroir}{largeurb}{\def\qtiroir@largeurb{#1}}
+\define@key{Qtiroir}{contenua}{\def\qtiroir@contenua{#1}}
+\define@key{Qtiroir}{contenub}{\def\qtiroir@contenub{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{Qtiroir}{
+	num=0,
+	figure=None,
+	enonce={},
+	enoncea={Réponse analytique},
+	enonceb={Réponse numérique},
+	pointsa=3,
+	pointsb=2,
+	hauteura=1.5cm,
+	hauteurb=1.5cm,
+	largeura={.95\linewidth},
+	largeurb={.95\linewidth},
+	contenua=None,
+	contenub=None}
+\newcommand{\Qtiroir}[2][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{Qtiroir}{#1}
+	\noindent\textbf{Question \qtiroir@num}\\
+	\ifthenelse{\equal{\qtiroir@figure}{None}}{
+		\qtiroir@enonce
+		}{
+		\begin{minipage}{0.7\linewidth}
+			\qtiroir@enonce
+		\end{minipage}
+		\hspace{0.2cm}
+		\begin{minipage}{0.4\linewidth}
+			\includegraphics[width=0.8\textwidth]{\qtiroir@figure}
+		\end{minipage}
+		}
+	
+	\vspace{.2cm}
+	\hspace{-1cm}
+	\begin{minipage}{0.5\textwidth}
+		\QOamc[num=\qtiroir@num,
+				lettre=a,
+				enonce=\qtiroir@enoncea,
+				points=\qtiroir@pointsa,
+				hauteur=\qtiroir@hauteura,
+				largeur=\qtiroir@largeura,
+				contenu=\qtiroir@contenua]{#2 .a}	
+	\end{minipage}
+	\hspace{0.4cm}
+	\begin{minipage}{0.5\textwidth}
+%		\vspace{-.5cm}
+		\QOamc[num=\qtiroir@num,
+				lettre=b,
+				enonce=\qtiroir@enonceb,
+				points=\qtiroir@pointsb,
+				hauteur=\qtiroir@hauteurb,
+				largeur=\qtiroir@largeurb,
+				contenu=\qtiroir@contenub]{#2 .b}	
+	\end{minipage}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QOsimple (pour l'encodage des points des QOsimple)
+%%%%%%%%% La différence avec \QO est que \QOsimple ne crée pas un groupe de question, mais directement une question
+%%%%%%%%% Il ne faut donc pas d'abord créer la question puis l'insérer. Quand on appelle \QOsimple, cela insère directement 
+%%%%%%%%% une question de type QO.
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QOsimple}{nomA}{\def\qosimple@nomA{#1}}
+\define@key{QOsimple}{nomB}{\def\qosimple@nomB{#1}}
+\define@key{QOsimple}{texte}{\def\qosimple@texte{#1}}
+\define@key{QOsimple}{orientation}{\def\qosimple@orientation{#1}}
+\define@key{QOsimple}{dist}{\def\qosimple@dist{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QOsimple}{
+	nomA=0,
+	nomB=0,
+	texte={\noindent Réservé au\\correcteur},
+	orientation=vert,
+	dist=-0.65cm}
+\newcommand{\QOsimple}[3][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qosimple@nom{#3}}{\def\qosimple@nom{#2}}
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QOsimple}{#1}
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qosimple@nom{#3}}{\def\qosimple@nom{#2}}
+    %% Si le mode "catalogue" est activé, imprimer le nom de la question
+    \ifthenelse{\equal{\OPTcatalogue}{true}}{\textbf{\qosimple@nom}\\}{}
+    \AMCboxStyle{shape=oval,size=2ex,down=.4ex,rule=.5pt,outsidesep=-0.5cm,color=black}
+	\begin{question}{\qosimple@nom}\bareme{e=60}\AMCnoCompleteMulti
+%		\bareme{MAX = 10, haut = 10}
+		\noindent\qosimple@texte
+		\ifthenelse{\equal{\qosimple@orientation}{horiz}}{
+	  		\begin{choiceshoriz}[o]
+			    \mauvaise{0}\hspace{\qosimple@dist}\scoring{0}
+			    \mauvaise{1}\hspace{\qosimple@dist}\scoring{1}
+			    \mauvaise{2}\hspace{\qosimple@dist}\scoring{2}
+			    \mauvaise{3}\hspace{\qosimple@dist}\scoring{3}
+			    \mauvaise{4}\hspace{\qosimple@dist}\scoring{4}
+			    \mauvaise{5}\hspace{\qosimple@dist}\scoring{5}
+			    \mauvaise{6}\hspace{\qosimple@dist}\scoring{6}
+			    \mauvaise{7}\hspace{\qosimple@dist}\scoring{7}
+			    \mauvaise{8}\hspace{\qosimple@dist}\scoring{8}
+			    \mauvaise{9}\hspace{\qosimple@dist}\scoring{9}
+			    \bonne{10}\scoring{10}
+			\end{choiceshoriz}
+			}{
+	  		\begin{reponses}[o]
+			    \mauvaise{0}\hspace{\qosimple@dist}\scoring{0}
+			    \mauvaise{1}\hspace{\qosimple@dist}\scoring{1}
+			    \mauvaise{2}\hspace{\qosimple@dist}\scoring{2}
+			    \mauvaise{3}\hspace{\qosimple@dist}\scoring{3}
+			    \mauvaise{4}\hspace{\qosimple@dist}\scoring{4}
+			    \mauvaise{5}\hspace{\qosimple@dist}\scoring{5}
+			    \mauvaise{6}\hspace{\qosimple@dist}\scoring{6}
+			    \mauvaise{7}\hspace{\qosimple@dist}\scoring{7}
+			    \mauvaise{8}\hspace{\qosimple@dist}\scoring{8}
+			    \mauvaise{9}\hspace{\qosimple@dist}\scoring{9}
+			    \bonne{10}\scoring{10}
+			\end{reponses}
+			}
+	\end{question}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+} 
+\makeatother
+
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QO (pour l'encodage des points des QO)
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QO}{nomA}{\def\qo@nomA{#1}}
+\define@key{QO}{nomB}{\def\qo@nomB{#1}}
+\define@key{QO}{texte}{\def\qo@texte{#1}}
+\define@key{QO}{orientation}{\def\qo@orientation{#1}}
+\define@key{QO}{dist}{\def\qo@dist{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QO}{
+	nomA=0,
+	nomB=0,
+	texte={\noindent Réservé au\\correcteur},
+	orientation=vert,
+	dist=-0.65cm}
+\newcommand{\QO}[3][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qo@nom{#3}}{\def\qo@nom{#2}}
+	% Création du groupe contenant la question (1 groupe par question)
+	\element{\qo@nom}{
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QO}{#1}
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qo@nom{#3}}{\def\qo@nom{#2}}
+    %% Si le mode "catalogue" est activé, imprimer le nom de la question
+    \ifthenelse{\equal{\OPTcatalogue}{true}}{\textbf{\qo@nom}\\}{}
+    \AMCboxStyle{shape=oval,size=2ex,down=.4ex,rule=.5pt,outsidesep=-0.5cm,color=black}
+	\begin{question}{\qo@nom}\bareme{e=60}\AMCnoCompleteMulti
+%		\bareme{MAX = 10, haut = 10}
+		\noindent\qo@texte
+		\ifthenelse{\equal{\qo@orientation}{horiz}}{
+	  		\begin{choiceshoriz}[o]
+			    \mauvaise{0}\hspace{\qo@dist}\scoring{0}
+			    \mauvaise{1}\hspace{\qo@dist}\scoring{1}
+			    \mauvaise{2}\hspace{\qo@dist}\scoring{2}
+			    \mauvaise{3}\hspace{\qo@dist}\scoring{3}
+			    \mauvaise{4}\hspace{\qo@dist}\scoring{4}
+			    \mauvaise{5}\hspace{\qo@dist}\scoring{5}
+			    \mauvaise{6}\hspace{\qo@dist}\scoring{6}
+			    \mauvaise{7}\hspace{\qo@dist}\scoring{7}
+			    \mauvaise{8}\hspace{\qo@dist}\scoring{8}
+			    \mauvaise{9}\hspace{\qo@dist}\scoring{9}
+			    \bonne{10}\scoring{10}
+			\end{choiceshoriz}
+			}{
+	  		\begin{reponses}[o]
+			    \mauvaise{0}\hspace{\qo@dist}\scoring{0}
+			    \mauvaise{1}\hspace{\qo@dist}\scoring{1}
+			    \mauvaise{2}\hspace{\qo@dist}\scoring{2}
+			    \mauvaise{3}\hspace{\qo@dist}\scoring{3}
+			    \mauvaise{4}\hspace{\qo@dist}\scoring{4}
+			    \mauvaise{5}\hspace{\qo@dist}\scoring{5}
+			    \mauvaise{6}\hspace{\qo@dist}\scoring{6}
+			    \mauvaise{7}\hspace{\qo@dist}\scoring{7}
+			    \mauvaise{8}\hspace{\qo@dist}\scoring{8}
+			    \mauvaise{9}\hspace{\qo@dist}\scoring{9}
+			    \bonne{10}\scoring{10}
+			\end{reponses}
+			}
+	\end{question}
+	}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QANNOTATEsimple (pour l'encodage des annotations des QO)
+%%%%%%%%% La différence avec \QANNOTATE est que \QANNOTATEsimple ne crée pas un groupe de question, mais directement une question
+%%%%%%%%% Il ne faut donc pas d'abord créer la question puis l'insérer. Quand on appelle \QANNOTATEsimple, cela insère directement 
+%%%%%%%%% une zone d'encodage de type ANNOTATE.
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QANNOTATEsimple}{nomA}{\def\qannsimple@nomA{#1}}
+\define@key{QANNOTATEsimple}{nomB}{\def\qannsimple@nomB{#1}}
+\define@key{QANNOTATEsimple}{texte}{\def\qannsimple@texte{#1}}
+\define@key{QANNOTATEsimple}{orientation}{\def\qannsimple@orientation{#1}}
+\define@key{QANNOTATEsimple}{dist}{\def\qannsimple@dist{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QANNOTATEsimple}{
+	nomA=0,
+	nomB=0,
+	texte={\noindent Réservé au\\correcteur},
+	orientation=vert,
+	dist=-0.65cm}
+\newcommand{\QANNOTATEsimple}[3][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qannsimple@nom{#3}}{\def\qannsimple@nom{#2}}
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QANNOTATEsimple}{#1}
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qannsimple@nom{#3}}{\def\qannsimple@nom{#2}}
+    %% Si le mode "catalogue" est activé, imprimer le nom de la question
+    \ifthenelse{\equal{\OPTcatalogue}{true}}{\textbf{\qannsimple@nom}\\}{}
+    \AMCboxStyle{shape=oval,size=2ex,down=.4ex,rule=.5pt,outsidesep=-0.5cm,color=black}
+	\begin{question}{\qannsimple@nom}\QuestionIndicative\AMCnoCompleteMulti
+%		\bareme{MAX = 10, haut = 10}
+		\noindent\qannsimple@texte
+		\ifthenelse{\equal{\qannsimple@orientation}{horiz}}{
+	  		\begin{choiceshoriz}[o]
+			    \mauvaise{A}\hspace{\qannsimple@dist}\scoring{0}
+			    \mauvaise{B}\hspace{\qannsimple@dist}\scoring{1}
+			    \mauvaise{C}\hspace{\qannsimple@dist}\scoring{2}
+			    \mauvaise{D}\hspace{\qannsimple@dist}\scoring{3}
+			    \mauvaise{E}\hspace{\qannsimple@dist}\scoring{4}
+			    \mauvaise{F}\hspace{\qannsimple@dist}\scoring{5}
+			    \bonne{G}\hspace{\qannsimple@dist}\scoring{6}
+			\end{choiceshoriz}
+			}{
+	  		\begin{reponses}[o]
+			    \mauvaise{A}\hspace{\qannsimple@dist}\scoring{0}
+			    \mauvaise{B}\hspace{\qannsimple@dist}\scoring{1}
+			    \mauvaise{C}\hspace{\qannsimple@dist}\scoring{2}
+			    \mauvaise{D}\hspace{\qannsimple@dist}\scoring{3}
+			    \mauvaise{E}\hspace{\qannsimple@dist}\scoring{4}
+			    \mauvaise{F}\hspace{\qannsimple@dist}\scoring{5}
+			    \bonne{G}\hspace{\qannsimple@dist}\scoring{6}
+			\end{reponses}
+			}
+	\end{question}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QANNOTATE (pour l'encodage des annotations des QO)
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QANNOTATE}{nomA}{\def\qann@nomA{#1}}
+\define@key{QANNOTATE}{nomB}{\def\qann@nomB{#1}}
+\define@key{QANNOTATE}{texte}{\def\qann@texte{#1}}
+\define@key{QANNOTATE}{orientation}{\def\qann@orientation{#1}}
+\define@key{QANNOTATE}{dist}{\def\qann@dist{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QANNOTATE}{
+	nomA=0,
+	nomB=0,
+	texte={\noindent Réservé au\\correcteur},
+	orientation=vert,
+	dist=-0.65cm}
+\newcommand{\QANNOTATE}[3][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qann@nom{#3}}{\def\qann@nom{#2}}
+	% Création du groupe contenant la question (1 groupe par question)
+	\element{\qann@nom}{
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QANNOTATE}{#1}
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qann@nom{#3}}{\def\qann@nom{#2}}
+    %% Si le mode "catalogue" est activé, imprimer le nom de la question
+    \ifthenelse{\equal{\OPTcatalogue}{true}}{\textbf{\qann@nom}\\}{}
+    \AMCboxStyle{shape=oval,size=2ex,down=.4ex,rule=.5pt,outsidesep=-0.5cm,color=black}
+	\begin{question}{\qann@nom}\QuestionIndicative\AMCnoCompleteMulti
+		\bareme{MAX = 10, haut = 10}
+		\noindent\qann@texte
+		\ifthenelse{\equal{\qann@orientation}{horiz}}{
+	  		\begin{choiceshoriz}[o]
+			    \mauvaise{A}\hspace{\qann@dist}\scoring{0}
+			    \mauvaise{B}\hspace{\qann@dist}\scoring{1}
+			    \mauvaise{C}\hspace{\qann@dist}\scoring{2}
+			    \mauvaise{D}\hspace{\qann@dist}\scoring{3}
+			    \mauvaise{E}\hspace{\qann@dist}\scoring{4}
+			    \mauvaise{F}\hspace{\qann@dist}\scoring{5}
+			    \bonne{G}\hspace{\qann@dist}\scoring{6}
+			\end{choiceshoriz}
+			}{
+	  		\begin{reponses}[o]
+			    \mauvaise{A}\hspace{\qann@dist}\scoring{0}
+			    \mauvaise{B}\hspace{\qann@dist}\scoring{1}
+			    \mauvaise{C}\hspace{\qann@dist}\scoring{2}
+			    \mauvaise{D}\hspace{\qann@dist}\scoring{3}
+			    \mauvaise{E}\hspace{\qann@dist}\scoring{4}
+			    \mauvaise{F}\hspace{\qann@dist}\scoring{5}
+			    \bonne{G}\hspace{\qann@dist}\scoring{6}
+			\end{reponses}
+			}
+	\end{question}
+	}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother
+
+
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QCM
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QCM}{nomA}{\def\qcm@nomA{#1}}
+\define@key{QCM}{nomB}{\def\qcm@nomB{#1}}
+\define@key{QCM}{enonce}{\def\qcm@enonce{#1}}
+\define@key{QCM}{bonne}{\def\qcm@bonne{#1}}
+\define@key{QCM}{repA}{\def\qcm@repA{#1}}
+\define@key{QCM}{repB}{\def\qcm@repB{#1}}
+\define@key{QCM}{repC}{\def\qcm@repC{#1}}
+\define@key{QCM}{repD}{\def\qcm@repD{#1}}
+\define@key{QCM}{repE}{\def\qcm@repE{#1}}
+\define@key{QCM}{pointsRep}{\def\qcm@pointsRep{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QCM}{
+	nomA=0,
+	nomB=0,
+	enonce=Enoncé,
+	bonne=1,
+	repA=,
+	repB=,
+	repC=,
+	repD=,
+	repE=,
+	pointsRep=3}
+\newcommand{\QCM}[3][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qcm@nom{#3}}{\def\qcm@nom{#2}}
+	% Création du groupe contenant la question (1 groupe par question)
+	\element{\qcm@nom}{
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QCM}{#1}
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qcm@nom{#3}}{\def\qcm@nom{#2}}
+    %% Si le mode "catalogue" est activé, imprimer le nom de la question
+    \ifthenelse{\equal{\OPTcatalogue}{true}}{\textbf{\qcm@nom}\\}{}
+	%% Definition de la question
+	\qcm@enonce
+	\begin{questionmult}{\qcm@nom}\bareme{mz={\qcm@pointsRep}}
+		\vspace{-1cm}
+%		\begin{multicols}{2}
+		\begin{reponses}
+		\ifthenelse{\equal{\qcm@bonne}{1}}{\bonne{{\Large \qcm@repA}}}{\mauvaise{{\Large \qcm@repA}}}
+		\mauvaise{{\Large \qcm@repB}}
+		\mauvaise{{\Large \qcm@repC}}
+		\mauvaise{{\Large \qcm@repD}}
+		\mauvaise{{\Large \qcm@repE}}
+		\end{reponses}
+%		\end{multicols}
+	\end{questionmult}
+	}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother
+
+
+%%%%%%%%% 
+%%%%%%%%% Définition de la commande \QF
+%%%%%%%%% 
+
+\makeatletter
+% ========= KEY DEFINITIONS =========
+\define@key{QF}{nomA}{\def\qf@nomA{#1}}
+\define@key{QF}{nomB}{\def\qf@nomB{#1}}
+\define@key{QF}{enonce}{\def\qf@enonce{#1}}
+\define@key{QF}{numQ}{\def\qf@numQ{#1}}
+\define@key{QF}{cadre}{\def\qf@cadre{#1}}
+\define@key{QF}{reponse}{\def\qf@reponse{#1}}
+\define@key{QF}{exp}{\def\qf@exp{#1}}
+\define@key{QF}{sansUnites}{\def\qf@sansUnites{#1}}
+\define@key{QF}{uniteA}{\def\qf@uniteA{#1}}
+\define@key{QF}{uniteAval}{\def\qf@uniteAval{#1}}
+\define@key{QF}{uniteB}{\def\qf@uniteB{#1}}
+\define@key{QF}{uniteBval}{\def\qf@uniteBval{#1}}
+\define@key{QF}{uniteC}{\def\qf@uniteC{#1}}
+\define@key{QF}{uniteCval}{\def\qf@uniteCval{#1}}
+\define@key{QF}{uniteD}{\def\qf@uniteD{#1}}
+\define@key{QF}{uniteDval}{\def\qf@uniteDval{#1}}
+\define@key{QF}{uniteE}{\def\qf@uniteE{#1}}
+\define@key{QF}{uniteEval}{\def\qf@uniteEval{#1}}
+\define@key{QF}{pointsRep}{\def\qf@pointsRep{#1}}
+\define@key{QF}{pointsExp}{\def\qf@pointsExp{#1}}
+\define@key{QF}{pointsUni}{\def\qf@pointsUni{#1}}
+\define@key{QF}{approxDec}{\def\qf@approxDec{#1}}
+% ========= KEY DEFAULTS =========
+\setkeys{QF}{
+	nomA=0,
+	nomB=0,
+	enonce=Enoncé,
+	numQ=-1,
+	cadre=0,
+	reponse=0,
+	exp=0,
+	sansUnites=0,
+	uniteA=$\kilo\gram$,
+	uniteAval=0,
+	uniteB=$\meter$,
+	uniteBval=0,
+	uniteC=$\second$,
+	uniteCval=0,
+	uniteD=$\ampere$,
+	uniteDval=0,
+	uniteE=$\kelvin$,
+	uniteEval=0,
+	pointsRep=3,
+	pointsExp=2,
+	pointsUni=0,
+	approxDec=10}
+\newcommand{\QF}[3][]{
+	{ % Ouvrir groupe pour assurer que les valeurs des arguments ne soient définies que localement
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qf@nom{#3}}{\def\qf@nom{#2}}
+	% Création du groupe contenant la question (1 groupe par question)
+	\element{\qf@nom}{
+	% Ajouter les clés de QCM définies avec \setkeys
+    \setkeys{QF}{#1}
+    %% Choisir le bon nom de question en fonction du syllabus (INGE/IRCI)
+    \ifthenelse{\equal{\sylla}{INGE}}{\def\qf@nom{#3}}{\def\qf@nom{#2}}
+    %% Si le mode "catalogue" est activé, imprimer le nom de la question
+    \ifthenelse{\equal{\OPTcatalogue}{true}}{\textbf{\qcm@nom}\\}{}
+    %% Transformer les valeurs données pour les exposants des unités en un nombre au bon format pour AMCnumericChoices
+    % Extraire les signes de chaque unité
+    \FPifneg{\qf@uniteAval}\def\qf@uniteAsign{1000000000}\else \def\qf@uniteAsign{0} \fi
+    \FPifneg{\qf@uniteBval}\def\qf@uniteBsign{10000000}\else \def\qf@uniteBsign{0} \fi
+    \FPifneg{\qf@uniteCval}\def\qf@uniteCsign{100000}\else \def\qf@uniteCsign{0} \fi
+    \FPifneg{\qf@uniteDval}\def\qf@uniteDsign{1000}\else \def\qf@uniteDsign{0} \fi
+    \FPifneg{\qf@uniteEval}\def\qf@uniteEsign{10}\else \def\qf@uniteEsign{0} \fi
+    % Prendre la valeur absolue de chaque valeur d'exposant
+    \FPabs{\qf@uniteAabsval}{\qf@uniteAval} 
+    \FPabs{\qf@uniteBabsval}{\qf@uniteBval} 
+    \FPabs{\qf@uniteCabsval}{\qf@uniteCval} 
+    \FPabs{\qf@uniteDabsval}{\qf@uniteDval} 
+    \FPabs{\qf@uniteEabsval}{\qf@uniteEval} 
+    % Calculer le nombre à encoder
+	\FPeval{\qf@unite}{
+				round(\qf@uniteAsign + \qf@uniteAabsval * 100000000 + 
+				\qf@uniteBsign + \qf@uniteBabsval * 1000000 + 
+				\qf@uniteCsign + \qf@uniteCabsval * 10000 + 
+				\qf@uniteDsign + \qf@uniteDabsval * 100 + 
+				\qf@uniteEsign + \qf@uniteEabsval ,0)}
+	% Prendre en compte le fait que l'exposant peut valoir n'importe quoi si la réponse est 0
+	\ifthenelse{\equal{\qf@reponse}{0.00}}{\def\qf@zeroapprox{9} \def\qf@zeroscoreapprox{\qf@pointsExp}}{\def\qf@zeroapprox{0} \def\qf@zeroscoreapprox{0}}
+	%% Definition de la question
+	\qf@enonce
+	\begin{center}		
+		\vspace{-1cm}
+		\begin{minipage}{0.2\linewidth}
+			\ifthenelse{\equal{\qf@cadre}{0}}{}{
+				\ifthenelse{\equal{\qf@numQ}{-1}}{}{\qf@numQ}
+				\includegraphics[scale=0.28]{\cadreEnco}
+				}
+			\begin{questionmultx}{\qf@nom digits}\bareme{mz={\qf@pointsRep},haut=1}
+			  \boxdigits
+			  \vspace{-0.3cm}
+			  \AMCnumericChoices{\qf@reponse}{
+				  scoring=true,
+				  digits=3,
+				  decimals=2,
+				  sign=true,
+				  borderwidth=0pt,
+				  scoreapprox={\qf@pointsRep},
+				  scoreexact={\qf@pointsRep},
+				  approx={\qf@approxDec},
+				  vertical=true,
+				  reverse=false}
+			\end{questionmultx}
+		\end{minipage}
+		\hspace{-0.5cm}
+		\begin{minipage}{0.2\linewidth}
+			\AMCnumero{2}
+			\ifthenelse{\equal{\qf@cadre}{0}}{}{
+				\ifthenelse{\equal{\qf@numQ}{-1}}{\vspace{1.3cm}}{\vspace{1.61cm}}
+				}
+			\begin{questionmultx}{\qf@nom exp}    
+			  \boxexp
+			  \vspace{-0.3cm}
+			  \AMCnumericChoices{\qf@exp}{
+				  digits=1,
+				  decimals=0,
+				  sign=true,
+				  borderwidth=0pt,
+				  approx={\qf@zeroapprox},
+				  scoreapprox={\qf@zeroscoreapprox},
+				  scoreexact={\qf@pointsExp},
+				  vertical=true,
+				  reverse=false}
+			\end{questionmultx}
+		\end{minipage}
+		\hspace{-2cm}
+		\vspace{0.15cm}
+		\ifthenelse{\equal{\qf@sansUnites}{0}}{
+			\begin{minipage}{0.4\linewidth}
+				\raisebox{1cm}{
+				\begin{questionmultx}{\qf@nom unites}\bareme{haut=2}
+					$\text{Unités} = \qf@uniteA ^ a 
+					\cdot \qf@uniteB ^ b 
+					\cdot \qf@uniteC ^ c 
+					\cdot \qf@uniteD ^ d 
+					\cdot \qf@uniteE ^ e $\\
+					\AMCnumericChoices{\qf@unite}{
+						digits=10,
+						decimals=0,
+						sign=false,
+						scoreexact={\qf@pointsUni},
+						borderwidth=0pt,
+						approx=0,
+						vertical=true,
+						reverse=false}
+				\end{questionmultx}}
+			\end{minipage}
+			}{}
+	\end{center}
+
+	}
+	} % Fermer groupe pour assurer que les valeurs des arguments ne soient définies que localement
+}
+\makeatother

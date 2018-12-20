@@ -1,0 +1,41 @@
+\begin{adjustwidth}{-0.7cm}{-0.7cm} % ajuste les marges localement 
+\textbf{Encodez votre matricule ci-dessous :}\vspace{0.1cm}
+
+\raisebox{-1.3cm}{\includegraphics[scale=0.115]{MatriculeCases.png}}
+\begin{minipage}{.65\linewidth}
+\centering
+
+%% Créer le champ d'encodage du matricule
+\AMCcodeHspace=.3em
+\AMCcodeVspace=.05em
+\AMCcodeH{zmatr}{6} %% champ avec 6 lignes pour matricule à 6 chiffres
+
+\end{minipage}
+\vspace{-0.5cm}
+\champnom{\fbox{    
+                \begin{minipage}{.6\linewidth}
+                	%% Template pour les champs "Nom, Prénom, Date"
+					\includegraphics[scale=0.122]{NomPrenomDate.png} 
+                \end{minipage}
+         }}
+\vspace*{.2cm}
+\end{adjustwidth}
+
+%%% TITRE DE L'EXAMEN
+\begin{center}
+	{\huge
+	{\bf \mnemo}
+	Test de CFS
+	}\\
+\end{center}
+
+	
+
+\placetextbox{0.685}{0.975}{Page \arabic{page} de \framebox{\nserie}}
+\placetextbox{0.80}{0.975}{\qrcode[height=0.75in]{\versionSierra / \mnemo /\anneeacad /\epreuve /\nserie /\Nsujet /\arabic{page}}}
+%% DATE
+\placetextbox{0.458}{0.833}{\Large{\examjour}}
+\placetextbox{0.528}{0.833}{\Large{\exammois}}
+\placetextbox{0.640}{0.833}{\Large{\examannee}}
+
+%\noindent{\Large \textbf{ATTENTION ! Pas de réponses au crayon !\\}}

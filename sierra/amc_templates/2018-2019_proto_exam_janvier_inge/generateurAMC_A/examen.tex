@@ -1,0 +1,109 @@
+\documentclass[a4paper]{article}
+% 0. (OPTIONNEL) Choisir le mode de publication "catalogue" pour créer un catalogue de questions
+\def\OPTcatalogue{false} % Défaut "false"
+%% Importation des packages et du préambule
+\input{../sources/packages.tex}
+
+%% DEFINIR LES FICHIERS SOURCES
+\def\pdfexamA{../examen_source_A.pdf}
+\def\pdfexamB{../examen_source_B.pdf}
+
+% Choisir le pdf correspondant à la version de l'examen
+\def\pdfexam{\pdfexamA}
+
+%%%%%%%%%
+%%%%%%%%% Paramètres de l'épreuve
+%%%%%%%%%
+
+% Choisir la section (\inge, \irci, \irar ou \irbi)
+\def\mnemo{\inge}
+% Choisir la série (a ou b)
+\def\nserie{a}
+
+% Choisir la date (séparez les chiffres par un espace et mettez un 0 devant les chiffres seuls) 
+% Exemple 5-6-2018 --> 0 5 - 0 6 - 1 8)
+\def\examjour{3 1}
+\def\exammois{1 0}
+\def\examannee{1 8} % N'indiquez que les chiffres des 10aines et unités de l'année. Les gens savent dans quel millénaire ils vivent.
+\def\duree{2h} % Durée annoncée de l'examen, affichée sur la page de modalités
+\def\nbpages{8} % Nombre total de pages
+
+% Définir paramètres pour le contenu du QR-code
+\def\versionSierra{v1.1}
+\def\anneeacad{2018-2019}
+\def\epreuve{ExamJanvier}
+
+
+
+% Importation des définitions des types de questions
+\input{../sources/defquestions.tex}
+
+\begin{document}
+
+
+
+%%%%%%
+%%%%%% Création d'un questionnaire
+%%%%%%
+
+\exemplaire{1}{
+		
+	%%%%%%%%%%%% PAGE DE GARDE %%%%%%%%%%%%%%%	
+	%% En-tête, définie dans le fichier "entete.tex" (commun aux séries A et B)
+	\input{../sources/entete.tex}
+	
+	%% Modalités, définies dans le fichier "sources/modalites.tex"
+	\input{../sources/modalites.tex}
+
+	%%%%%%%%%%%% PAGE 2 QUESTIONS OUVERTES 1 %%%%%%%%%%%%%%%	
+	\pageqo[pagepdf=2, numqa=1, numqb=2, gauche=1cm, bas=-4cm, droite=0cm, haut=-1cm] 
+		
+	%%%%%%%%%%%% PAGE 3 QUESTIONS OUVERTES 2 %%%%%%%%%%%%%%%	
+	\pageqo[pagepdf=3, numqa=3, numqb=4]
+	
+	%%%%%%%%%%%% PAGE 4 %%%%%%%%%%%%%%%	
+	\newpageqr
+
+	
+	\Qtiroir[num=1,
+			 figure={Q3.png},
+			 enonce={\vspace{0.5cm}Deux ferrys A et B de même modèle voyagent en sens opposés et font la connexion 
+			 		entre la ville de Nynäshamn (Suède) et Visby (île du Gotland, Suède) située à une distance $d$ 
+					au sud de Nynäshamn. Un vent fort de secteur Sud génère un courant marin vers le nord 
+					dont la vitesse est  $V_m$. Le voyage du ferry A naviguant de Nynäshamn vers Visby a une 
+					durée $\mathbf{t_A} = 3$h$~18~$min et le voyage du ferry B naviguant de Visby vers Nynäshamn 
+					a une durée $\mathbf{t_B} = 2$h$~49~$min. La vitesse de croisière de ce modèle de 
+					ferry en l'absence de courant est de $\mathbf{V_F} = 50 \, \kilo\meter/$h. 
+					De plus, on considère que la vitesse du courant est constante et on néglige les phases 
+					d'amarrage et de désamarrage dans la description du mouvement des ferrys.}
+			 ]{QF1}
+			
+	\vspace{-1cm}
+	\Qtiroir[num=2,
+			 enonce={Enoncé de la question 2.},
+			 enoncea={Réponse a},
+			 enonceb={Réponse b},
+			 figure=None,
+			 pointsa=5,
+			 pointsb=3,
+			 hauteura=1cm,
+			 hauteurb=2cm,
+			 contenua=None,
+			 contenub={$\rho =$ \hspace{2cm} $\sigma=$}]{QF2}
+			 
+	\Qtiroir[num=3, 
+			 enonce = {Enoncé de la question 3}]{QF3}
+			
+	\Qtiroir[num=4, 
+			 enonce = {Enoncé de la question 4}]{QF4}
+
+	
+	\newpageqr
+	
+	%%%%%%%%%%%% Question lettres grecques %%%%%%%%%%%%%%%	
+	\qgrec{Question 10 (bonus)}{rho, phi, lambda, gamma, tau, beta, sigma, eta, xi, zeta}
+		
+	
+}    
+
+\end{document}

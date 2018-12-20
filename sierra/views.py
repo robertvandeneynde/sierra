@@ -34,16 +34,10 @@ def hello(request):
     return HttpResponse('A <strong>Tadaa</strong>')
 
 
-<<<<<<< HEAD
-def world(request):
-    return render(request, A('index.html'))  # return Http200(open(A()).read())
-
-=======
 # first views
 
 def homepage(request):
     return render(request, A('index.html'))
->>>>>>> 91e096c21966379de89b65ec447381c38582d8d5
 
 # utils
 class QuickHtml:
@@ -92,15 +86,10 @@ def create_project(request):
     academic_year_append = R.get('academic_year_append', False)
 
     if academic_year_append:
-<<<<<<< HEAD
-        name += '_' + (lambda x: f'{x}-{x+1}')(x=timezone.now().year)
-
-=======
         N = timezone.now()
         x = N.year if (N.month, N.day) >= (9, 1) else N.year - 1
         name = name + '_' + f'{x}-{x+1}'
-    
->>>>>>> 91e096c21966379de89b65ec447381c38582d8d5
+
     if mnemo:
         name = mnemo + '_' + name
 
@@ -177,15 +166,11 @@ def project_detail(request, likeid):
     # [n.parts[-1] for n in (project.abs_path / 'data').iterdir()]
 
     # raise ''
-<<<<<<< HEAD
 
-=======
-    
     import sqlite3
     conn = sqlite3.connect(str((project.abs_path / 'data' / 'capture.sqlite').absolute()))
     page_infos = conn.execute('select student, page, copy from capture_page order by student, page, copy').fetchall()
-    
->>>>>>> 91e096c21966379de89b65ec447381c38582d8d5
+
     return render(request, A('project.html'), {
         'project': project,
         'page_infos': page_infos,
@@ -193,34 +178,29 @@ def project_detail(request, likeid):
 
 def project_list_papers(request, likeid):
     assert request.method == 'GET'
-    
+
     project = AmcProject.objects.get(rel_path=likeid)
-    
+
     import sqlite3
     conn = sqlite3.connect(str((project.abs_path / 'data' / 'capture.sqlite').absolute()))
-    
+
     return render(request, A('papers.html'), {
         'project': project,
         'page_infos': conn.execute('select student, page, copy from capture_page order by student, page, copy').fetchall(),
         'page_failed': conn.execute('select filename from capture_failed order by timestamp').fetchall(),
     })
 
-<<<<<<< HEAD
-
-def amc_prepare(request):
-
-=======
 def compile_project(project):
     import subprocess
     from subprocess import PIPE, STDOUT
     r = subprocess.check_output([
         'auto-multiple-choice',
-        'prepare', 
+        'prepare',
         '--mode', 's',
         '--out-sujet', 'subject.pdf',
         'source.tex',
     ], cwd=project.abs_path, stderr=STDOUT)
-    
+
     # here no exception
     # project.does_compile = True
     # project.save()
@@ -228,70 +208,69 @@ def compile_project(project):
 
 def project_upload_scans(request):
     assert request.method == 'POST'
-    
+
     R = request.POST
     
     if "project_likeid" in R:
         project = AmcProject.get_by_likeid(R["project_likeid"])
     else:
         project = AmcProject.objects.get(id=R["project_id"])
-    
+
     scans = project.abs_path / 'scans'
     scans.mkdir(exist_ok=True)
-    
+
     import itertools
     it = itertools.count(1)
-    
+
     from os.path import splitext
-    
+
     now = timezone.now().strftime('%Y-%m-%dT%H:%M:%S')
-    
+
     uploaded = []
     for f in request.FILES.getlist('scans'):
         ext = splitext(f.name)[-1].lower()
-        new_file = scans / '{}_{}{}'.format(now, next(it), ext) 
+        new_file = scans / '{}_{}{}'.format(now, next(it), ext)
         assert not new_file.exists()
         with open(new_file, 'wb') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
         uploaded.append(new_file)
-    
+
     import subprocess
     from subprocess import PIPE, STDOUT
     r = subprocess.check_output([
         'auto-multiple-choice',
-        'analyse', 
+        'analyse',
         # '--seuil-coche', '0.6',  # read from options.xml for compability with GUI
         '--projet', str(project.abs_path),
         *(str(u.absolute()) for u in uploaded)
     ], cwd=project.abs_path, stderr=STDOUT)
-    
+
     # each line is in +///+ notation
     # if the scan is not good, it will be in the sqlite (capture_failed table, containing capture_failed.filename with %PROJET)
     # else, it will be in capture_page table, with src startswith '%PROJET/' (student, page, copy)
-    
+
     return HttpResponse(QuickHtml.enclose('<pre>',  r.decode('utf-8', 'replace')))
 
 def project_upload_source(request):
     assert request.method == 'POST'
-    
+
     R = request.POST
-    
+
     if "project_likeid" in R:
         project = AmcProject.get_by_likeid(R["project_likeid"])
     else:
         project = AmcProject.objects.get(id=R["project_id"])
-    
+
     if 'source' not in request.FILES:
         return Http400("400")
-    
+
     if project.has_source():
         pass  # chill
-    
+
     with open(project.abs_path / 'source.tex', 'wb') as f:
         f.write(request.FILES['source'].read())
-        
+
     return compile_project(project)
-    
->>>>>>> 91e096c21966379de89b65ec447381c38582d8d5
+
     return HttpResponse('Ok')

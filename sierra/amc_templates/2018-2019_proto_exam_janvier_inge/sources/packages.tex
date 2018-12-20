@@ -1,0 +1,90 @@
+\usepackage[utf8x]{inputenc}    
+\usepackage[T1]{fontenc}
+
+\usepackage{ifthen}
+
+\ifthenelse{\equal{\OPTcatalogue}{true}}{
+\usepackage[francais,completemulti,box,insidebox,indivanswers]{automultiplechoice}
+}{
+\usepackage[francais,completemulti,box,insidebox]{automultiplechoice}
+}
+
+
+\usepackage{pdfpages}
+
+\usepackage{fancyhdr} % Pour pouvoir changer le style des numéros de page
+\pagestyle{fancy}
+\fancyhf{}
+
+\usepackage{wrapfig} % Pour permettre la création de figure "enveloppées" par le texte
+
+\usepackage{graphicx}%pour utiliser includegraphics
+\usepackage[shortlabels]{enumitem}%pour changer le style des enumerate
+
+\usepackage{tikz}
+\usepackage{circuitikz}%pour dessiner
+\usetikzlibrary{babel}
+\usetikzlibrary{arrows}
+\usepackage{pgfplots}%pour pouvoir aussi utiliser l'environnement axis
+\usepackage{bm}%pour pouvoir mettre les symboles mathématiques en gras
+
+\usepackage{pgffor}
+
+\usepackage{epstopdf}
+
+\usepackage{qrcode} % Pour générer des QR-codes (compatible avec PDFLaTeX)
+
+%% Réduire les marges
+\geometry{hmargin=2cm,headheight=2cm,headsep=.3cm,footskip=1cm,top=2.6cm,bottom=2.5cm}   
+
+\usepackage{multicol}
+\usepackage{changepage} % pour ajuster les marges localement dans le document
+  
+\usepackage{fp} % pour faire des maths dans LaTeX
+\usepackage{amsmath} % Extension symboles mathématiques (pour les phaseurs dans le cas présent)
+\usepackage{bm} % "bold mathematics" pour mettre les symboles mathématiques en gras (lettres grecques en particulier). Commande \bm{}.
+
+\usepackage{keyval}% http://ctan.org/pkg/keyval
+\usepackage[binary,squaren,Gray,cdot]{SIunits}%Pour écrire les volts et les décibels
+
+
+\usepackage{forloop} % pour faire des boucles "for" en latex
+
+
+% pour placer le numéro de l'interro
+%\usepackage[pscoord]{eso-pic}% The zero point of the coordinate system is the lower left corner of the page (the default).
+\newcommand{\placetextbox}[3]{% \placetextbox{<horizontal pos>}{<vertical pos>}{<stuff>}
+  \setbox0=\hbox{#3}% Put <stuff> in a box
+  \AddToShipoutPictureFG*{% Add <stuff> to current page foreground
+    \put(\LenToUnit{#1\paperwidth},\LenToUnit{#2\paperheight}){\vtop{{\null}\makebox[0pt][c]{#3}}}%
+  }%
+}%
+
+
+%%%% Définitions pour la section
+\def\inge{PHYS-S-1001 INGE}
+\def\irci{PHYS-H-100 IRCI}
+\def\irar{PHYS-H-100 IRAR}
+\def\irbi{PHYS-H-101 IRBI}
+
+%%%%% Définitions pour les chapitres
+\def\pathtoquestions{../../Questions/}
+\def\TH{\pathtoquestions questionsTH.tex}
+\def\ES{\pathtoquestions questionsES.tex}
+\def\MS{\pathtoquestions questionsMS.tex}
+\def\EM{\pathtoquestions questionsEM.tex}
+\def\OO{\pathtoquestions questionsOO.tex}
+\def\PM{\pathtoquestions questionsPM.tex}
+\def\LA{\pathtoquestions questionsL1.tex}
+\def\LB{\pathtoquestions questionsL2.tex}
+\def\LC{\pathtoquestions questionsL3.tex}
+\def\LD{\pathtoquestions questionsL4.tex}
+\def\LE{\pathtoquestions questionsL5.tex}
+\def\LF{\pathtoquestions questionsL6.tex}
+\def\test{questionsTEST.tex}
+
+% Définir les chemins d'accès aux figures
+\graphicspath{{../fig/corefig/}{../fig/}}
+
+% Choisir une seed pour le mélange aléatoire des questions
+\AMCrandomseed{152738} %1527384
