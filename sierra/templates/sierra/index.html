@@ -129,6 +129,10 @@
             })
         })</script>
         <script>$(function(){
+            /**
+             * For each <a> in the .nav that points to an anchor (href startswith "#")
+             * When it's clicked, display the article it points too
+             */
             $('.nav nav a').each(function(){
                 var h = $(this).attr('href');
                 if(h[0] == '#') {
@@ -175,6 +179,10 @@
         })</script>
         
         <script>$(function(){
+            /*
+             * Implements the search
+             * Hides or shows elements based on the text of the search
+             */
             /* $("#the_search").on('keydown', function(ev) {
                 console.log("down", '@' + (new Date().getSeconds()), ev.keyCode, ev);
             })
@@ -249,13 +257,13 @@
             //  assert h3.childNodes.length == 1
             //  assert h3.childNodes[0].nodeType == TEXT_NODE
                 
-            var block_of = new Map()
+            var block_of = new Map() // maps each <h3> with it's <section>
             for(let h3 of LH3)
                 if(h3.nextElementSibling && h3.nextElementSibling.tagName.toLowerCase() == 'section')
                     block_of.set(h3, h3.nextElementSibling)
                     
-            var parent_of = new Map()
-            for(let h3 of LH3) 
+            var parent_of = new Map() // maps each <h3> with it's <article>
+            for(let h3 of LH3)
                 parent_of.set(h3, firstParentBeing_Of_('article', h3))
                 
             var LS = []
@@ -268,7 +276,7 @@
                 if(y)
                     LS.push(y)
             
-            console.log('\nLS', LS, '\nLH3', LH3, '\nparent_of', parent_of, '\nblock_of', block_of)
+            //console.log('\nLS', LS, '\nLH3', LH3, '\nparent_of', parent_of, '\nblock_of', block_of)
             
             // default setup save
             for(let h3 of LH3)
@@ -373,6 +381,15 @@
                     <p><input type="submit"/>
                 </form>
             </section>
+        </article>
+        
+        <article>
+        <h2>Donner des scans</h2>
+            <h3>Donner des scans (upload)</h3>
+            <p>Les scans contiennent un QR code pour identifier le projet</p>
+            <form action="/raw/upload_scans_with_qr/" method="POST" enctype='multipart/form-data'>
+                <input name="scans" type="file" multiple="multiple" >
+            </form>
         </article>
         
         </div>
