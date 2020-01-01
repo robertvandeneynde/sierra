@@ -17,6 +17,7 @@ urlpatterns = [
     
     path('raw/project/upload_source/', views.project_upload_source),
     path('raw/project/upload_scans/', views.project_upload_scans),
+    path('raw/project/upload_scans_with_qr/', views.upload_scans_with_qr),
     
     path('project/<likeid>/', views.project_detail),
     path('project/<likeid>/papers', views.project_list_papers),
