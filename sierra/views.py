@@ -280,7 +280,7 @@ class QRCode:
         contents = []
         
         import re
-        Re = re.compile(re.escape('QR-Code:(.*)'))
+        Re = re.compile(re.escape('QR-Code:') + '(.*)')
         for l in r.splitlines():
             if l.strip():
                 m = Re.fullmatch(l)
