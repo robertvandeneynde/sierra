@@ -165,11 +165,12 @@ def project_detail(request, likeid):
     project = AmcProject.objects.get(rel_path=likeid)
     # [n.parts[-1] for n in (project.abs_path / 'data').iterdir()]
 
-    # raise ''
-
-    import sqlite3
-    conn = sqlite3.connect(str((project.abs_path / 'data' / 'capture.sqlite').absolute()))
-    page_infos = conn.execute('select student, page, copy from capture_page order by student, page, copy').fetchall()
+    if project.does_compile():
+        import sqlite3
+        conn = sqlite3.connect(str((project.abs_path / 'data' / 'capture.sqlite').absolute()))
+        page_infos = conn.execute('select student, page, copy from capture_page order by student, page, copy').fetchall()
+    else:
+        page_infos = None
 
     return render(request, A('project.html'), {
         'project': project,
@@ -252,6 +253,7 @@ def project_upload_scans(request, files_existing:list=None):
         # '--seuil-coche', '0.6',  # TODO read from options.xml for compability with GUI
         '--projet', str(project.abs_path),
         *(str(u.absolute()) for u in uploaded)
+        # beware of --ignore-red
     ], cwd=project.abs_path, stderr=STDOUT)
 
     # each line is in +///+ notation
@@ -321,16 +323,16 @@ def upload_scans_with_qr(request):
     
     # reads QR code
     # TODO: group files by project to call project_upload_scans one time per project
+    rel_paths = {}
     for filename in files_existing:
         qr_infos = QRCode.read_based_on_version(QRCode.get_from_file(filename))
+        rel_paths[filename] = qr_infos['mnemo'] + '-' + qr_infos['epreuve']
     
-        # finds project
-    
-        rel_path = qr_infos['mnemo'] + '-' + qr_infos['epreuve']
-        project = get_object_or_404(AmcProject.objects, rel_path=rel_path)
+    for project_path in set(rel_paths.values()):
+        project = get_object_or_404(AmcProject.objects, rel_path=project_path)
         
         project_upload_scans(
-            files_existing=[filename]
+            files_existing=[filename for filename in files_existing if rel_paths[filename] == project_path],
             request=OwnHttpRequest(dict(post={
                 'project_likeid': project.id
             }))
