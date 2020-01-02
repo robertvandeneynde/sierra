@@ -297,8 +297,8 @@ class QRCode:
     @staticmethod
     def verify_on_project(filename, project:AmcProject):
         infos = QRCode.read_based_on_version(QRCode.get_from_file(filename))
-        mnemo, epreuve = infos['mnemo'], infos['epreuve']
-        if not project.relpath == mnemo + '-' + epreuve:
+        mnemo, epreuve, acadyear = infos['mnemo'], infos['epreuve'], infos['acadyear']
+        if not project.relpath == mnemo + '_' + epreuve + '_' + acadyear:
             raise ValueError
   
     @staticmethod
@@ -326,7 +326,7 @@ def upload_scans_with_qr(request):
     rel_paths = {}
     for filename in files_existing:
         qr_infos = QRCode.read_based_on_version(QRCode.get_from_file(filename))
-        rel_paths[filename] = qr_infos['mnemo'] + '-' + qr_infos['epreuve']
+        rel_paths[filename] = qr_infos['mnemo'] + '_' + qr_infos['epreuve'] + '_' + qr_infos['acadyear']
     
     for project_path in set(rel_paths.values()):
         project = get_object_or_404(AmcProject.objects, rel_path=project_path)
