@@ -333,9 +333,9 @@ def upload_scans_with_qr(request):
         
         project_upload_scans(
             files_existing=[filename for filename in files_existing if rel_paths[filename] == project_path],
-            request=OwnHttpRequest(dict(post={
+            request=OwnHttpRequest(request.user, post={
                 'project_likeid': project.id
-            }))
+            })
         )
     
     return HttpResponse('{n} files uploaded successfully'.format(n=len(files_existing)))
