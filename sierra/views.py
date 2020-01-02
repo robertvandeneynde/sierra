@@ -304,7 +304,7 @@ class QRCode:
     @staticmethod
     def read_based_on_version(string) -> dict:
         version, *rest = string.split('/')
-        if version == '1.1':
+        if version == 'v1.1':
             mnemo, acadyear, epreuve, serie, papernumber, page = rest
             return dict(mnemo=mnemo, acadyear=acadyear, epreuve=epreuve, serie=serie, papernumber=papernumber, page=page)
         else:
