@@ -198,20 +198,29 @@ def compile_project(project):
         'auto-multiple-choice',
         'prepare',
         '--mode', 's',
+        '--with', 'pdflatex',
         '--out-sujet', 'subject.pdf',
+        '--out-calage', 'calage.xy',
         'source.tex',
+    ], cwd=project.abs_path, stderr=STDOUT)
+
+    r2 = subprocess.check_output([
+        'auto-multiple-choice',
+        'meptex',
+        '--src', str((project.abs_path / 'calage.xy').absolute()),
+        '--data', str((project.abs_path / 'data').absolute()),
     ], cwd=project.abs_path, stderr=STDOUT)
 
     # here no exception
     # project.does_compile = True
     # project.save()
-    return HttpResponse(QuickHtml.enclose('<pre>',  r.decode('utf-8', 'replace')))
+    return HttpResponse(QuickHtml.enclose('<pre>',  r.decode('utf-8', 'replace') + '\nMEPTEX\n' + r2.decode('utf-8', 'replace')))
 
 def project_upload_scans(request, files_existing:list=None):
     assert request.method == 'POST'
 
     R = request.POST
-    
+
     if "project_likeid" in R:
         project = AmcProject.get_by_likeid(R["project_likeid"])
     else:
