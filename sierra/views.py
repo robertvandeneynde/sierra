@@ -240,18 +240,18 @@ def project_upload_scans(request, files_existing:list=None):
     for f in (request.FILES.getlist('scans') if files_existing is None else files_existing):
         ext = splitext(f.name)[-1].lower()
         new_file = scans / '{}_{}{}'.format(now, next(it), ext)
-        
+
         assert not new_file.exists() # TODO verify all files before writing them
-        
+
         if files_existing is None:
             with open(new_file, 'wb') as destination:
                 for chunk in f.chunks():
                     destination.write(chunk)
         else:
             os.rename(f, str(new_file.absolute()))
-        
+
         QRCode.verify_on_project(str(new_file.absolute()), project)
-        
+
         uploaded.append(new_file)
 
     import subprocess
@@ -282,12 +282,14 @@ class OwnHttpRequest(HttpRequest):
 class QRCode:
     @staticmethod
     def get_from_file(filename):
+        import subprocess
         r = subprocess.check_output([
             'zbarimg', filename
         ], stderr=None)  # zbarimg produces stderr like 'scanned 1 barcode symbols from 1 images in 0.39 seconds'
-        
+        r = r.decode('utf-8', 'replace')
+
         contents = []
-        
+
         import re
         Re = re.compile(re.escape('QR-Code:') + '(.*)')
         for l in r.splitlines():
@@ -295,7 +297,7 @@ class QRCode:
                 m = Re.fullmatch(l)
                 if m:
                     contents.append(m.group(1))
-        
+
         if len(contents) == 1:
             return contents[0]
         elif len(contents) == 0:
@@ -307,9 +309,9 @@ class QRCode:
     def verify_on_project(filename, project:AmcProject):
         infos = QRCode.read_based_on_version(QRCode.get_from_file(filename))
         mnemo, epreuve, acadyear = infos['mnemo'], infos['epreuve'], infos['acadyear']
-        if not project.relpath == mnemo + '_' + epreuve + '_' + acadyear:
+        if not project.rel_path == mnemo + '_' + epreuve + '_' + acadyear:
             raise ValueError
-  
+
     @staticmethod
     def read_based_on_version(string) -> dict:
         version, *rest = string.split('/')
@@ -321,7 +323,7 @@ class QRCode:
 
 def upload_scans_with_qr(request):
     """ TODO identifies the QR code and calls project_upload_scans """
-    
+
     # TODO: save all files in /tmp... then renames it in project_upload_scans
     files_existing = []
     for f in request.FILES.getlist('scans'):
@@ -329,24 +331,24 @@ def upload_scans_with_qr(request):
         for chunk in f.chunks():
             destination.write(chunk)
         files_existing.append(filename)
-    
+
     # reads QR code
     # TODO: group files by project to call project_upload_scans one time per project
     rel_paths = {}
     for filename in files_existing:
         qr_infos = QRCode.read_based_on_version(QRCode.get_from_file(filename))
         rel_paths[filename] = qr_infos['mnemo'] + '_' + qr_infos['epreuve'] + '_' + qr_infos['acadyear']
-    
+
     for project_path in set(rel_paths.values()):
         project = get_object_or_404(AmcProject.objects, rel_path=project_path)
-        
+
         project_upload_scans(
             files_existing=[filename for filename in files_existing if rel_paths[filename] == project_path],
             request=OwnHttpRequest(request.user, post={
                 'project_likeid': project.id
             })
         )
-    
+
     return HttpResponse('{n} files uploaded successfully'.format(n=len(files_existing)))
 
 def project_upload_source(request):
