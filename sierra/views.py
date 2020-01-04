@@ -3,6 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadReque
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
 
 import shutil
 from re import compile as Re
@@ -36,6 +38,7 @@ def hello(request):
 
 # first views
 
+@login_required
 def homepage(request):
     return render(request, A('index.html'))
 
@@ -78,7 +81,7 @@ class QuickHtml:
 
 # real views
 
-
+@login_required
 def create_project(request):
     R = request.POST
     name = R['name'].strip()
@@ -121,7 +124,7 @@ def create_project(request):
 
         return HttpResponse(f'Project <b>{name}</b> created !')  # redirect('/projects')
 
-
+@login_required
 def import_from_filesystem(request):
     assert request.method == 'POST'
     R = request.POST
@@ -138,7 +141,7 @@ def import_from_filesystem(request):
 
     return HttpResponse(QuickHtml.base_links_after('Ok'))
 
-
+@login_required
 def list_projects(request):
     assert request.method == 'GET'
     R = request.GET
@@ -158,7 +161,7 @@ def list_projects(request):
         for exists, name in data
     ))))
 
-
+@login_required
 def project_detail(request, likeid):
     assert request.method == 'GET'
 
@@ -177,6 +180,7 @@ def project_detail(request, likeid):
         'page_infos': page_infos,
     })
 
+@login_required
 def project_list_papers(request, likeid):
     assert request.method == 'GET'
 
@@ -191,6 +195,8 @@ def project_list_papers(request, likeid):
         'page_failed': conn.execute('select filename from capture_failed order by timestamp').fetchall(),
     })
 
+@login_required
+@login_required
 def compile_project(project):
     import subprocess
     from subprocess import PIPE, STDOUT
@@ -216,6 +222,7 @@ def compile_project(project):
     # project.save()
     return HttpResponse(QuickHtml.enclose('<pre>',  r.decode('utf-8', 'replace') + '\nMEPTEX\n' + r2.decode('utf-8', 'replace')))
 
+@login_required
 def project_upload_scans(request, files_existing:list=None):
     assert request.method == 'POST'
 
@@ -321,6 +328,7 @@ class QRCode:
         else:
             raise ValueError(f'QR code version {version} not supported')
 
+@login_required
 def upload_scans_with_qr(request):
     """ TODO identifies the QR code and calls project_upload_scans """
 
@@ -351,6 +359,7 @@ def upload_scans_with_qr(request):
 
     return HttpResponse('{n} files uploaded successfully'.format(n=len(files_existing)))
 
+@login_required
 def project_upload_source(request):
     assert request.method == 'POST'
 
