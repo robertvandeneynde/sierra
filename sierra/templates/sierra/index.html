@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Titre</title>
+        <title>Sierra - AMC à portée de clic</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
             integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
         <style>
@@ -33,7 +33,7 @@
             #wrapper {
                 padding-left: 10px;
             }
-            
+
             #the_sierra {
                 display: inline-block;
                 vertical-align: middle;
@@ -87,7 +87,7 @@
             body {
                 padding: 0;
             }
-            
+
             @media screen and (max-width: 620px) {
                 #the_sierra .text {
                     display: none;
@@ -110,15 +110,15 @@
                 background: #c30;
             }
             */
-            
+
             .info {
                 font-style: italic;
                 font-size: 75%;
             }
         </style>
-        
+
         <script src="https://code.jquery.com/jquery-2.1.4.js"></script> <!-- integrity="sha384-1qy6pxCPVEhkjPJM8mBaaRNIDGE20UzrPyndMEoCaeK390vhZ3jt3SQtS6aZDqRA" -->
-        
+
         <script>$(function(){
             var Q = $('form[action="/raw/create_project/"] [name="mnemo"]')
             Q.on('focusout', function() {
@@ -145,7 +145,7 @@
                                     return x
                             return null
                         })();
-                        
+
                         var allSiblingArticle = (function(){
                             var L = []
                             for(var x = firstParentThatIsArticle.parentNode.firstChild; x; x = x.nextSibling)
@@ -155,29 +155,29 @@
                                     L.push(x)
                             return L
                         })();
-                        
+
                         $(allSiblingArticle).hide();
                         $(firstParentThatIsArticle).show();
                         // IDEA: instead of hide/show, put block first
-                        
+
                         ev.preventDefault();
-                        
+
                         // TODO: move section to the top and highlight
                     })
                 }
             })
         })</script>
-        
+
         <script>$(function(){
             // $(document.body).on('keyup', function(ev) {
                 // alert(ev.keyCode);
             // })
         })</script>
-        
+
         <script>$(function(){
             $('#the_search').val('')
         })</script>
-        
+
         <script>$(function(){
             /*
              * Implements the search
@@ -189,18 +189,18 @@
             $("#the_search").on('keyup', function(ev) {
                 console.log("up", '@' + (new Date().getSeconds()), ev.keyCode, ev);
             }) */
-            
+
             function firstParentBeing_Of_(tag, x) {
                 for(var elem = x.parentElement; elem; elem = elem.parentElement)
                     if(tag.toUpperCase() == elem.tagName.toUpperCase())
-                        return elem 
+                        return elem
                 return null
             }
-            
+
             function RegExpEscape(s) {  // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
                 return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
             }
-            
+
             /**
              !!match('hello', 'hel') == true
              !!match('hello', 'hal') == false
@@ -209,7 +209,7 @@
                 var doesMatch = !!(new RegExp(RegExpEscape(y), 'i')).exec(x)
                 if(! doesMatch)
                     return null
-                
+
                 var inputString = x;
                 // javascript doesnt't have a fine grained regex module like, say, python
                 // implementing the algorithm myself
@@ -219,7 +219,7 @@
                 for(var i = 0; i < x.length; i++) {
                     // if(all(x[i+j] == y[j] for j in range(y.length)))
                     //    spans.push([i, i + y.length])
-                    
+
                     var ok = true;
                     for(var j = 0; j < y.length; j++) {
                         if(x[i+j] != y[j]) {
@@ -227,11 +227,11 @@
                             break;
                         }
                     }
-                    
+
                     if(ok)
                         spans.push([i, i + y.length])
                 }
-                
+
                 return {
                     spans: spans,  // match iff spans.length > 0
                     highlighted: function(begin, end) {
@@ -248,24 +248,24 @@
                     }
                 }
             }
-            
+
             // init
             var LH3 = document.querySelectorAll('h3:not(.nav)')
-            
+
             // for(h3 of LH3) // TODO: remove comments in that test
             //  assert h3.children.length == 0
             //  assert h3.childNodes.length == 1
             //  assert h3.childNodes[0].nodeType == TEXT_NODE
-                
+
             var block_of = new Map() // maps each <h3> with it's <section>
             for(let h3 of LH3)
                 if(h3.nextElementSibling && h3.nextElementSibling.tagName.toLowerCase() == 'section')
                     block_of.set(h3, h3.nextElementSibling)
-                    
+
             var parent_of = new Map() // maps each <h3> with it's <article>
             for(let h3 of LH3)
                 parent_of.set(h3, firstParentBeing_Of_('article', h3))
-                
+
             var LS = []
             for(let h3 of LH3)
                 LS.push(h3)
@@ -275,13 +275,13 @@
             for(let y of parent_of.values())
                 if(y)
                     LS.push(y)
-            
+
             //console.log('\nLS', LS, '\nLH3', LH3, '\nparent_of', parent_of, '\nblock_of', block_of)
-            
+
             // default setup save
             for(let h3 of LH3)
                 $(h3).data('init-text', $(h3).html())
-            
+
             // events
             $("#the_search").on('keyup', function(ev) {
                 var s = $(ev.target).val().trim()
@@ -291,10 +291,10 @@
                         $(h3).html($(h3).data('init-text'))
                 } else {
                     $(LS).hide()
-                    
+
                     for(let h3 of LH3)
                         $(h3).html($(h3).data('init-text'))
-                    
+
                     for(let h3 of LH3) {
                         var matcher = match($(h3).data('init-text'), s);
                         if(matcher) {
@@ -303,7 +303,7 @@
                             $(h3).html('<mark>' + $(h3).data('init-text') + '</mark>')
                             $(parent_of.get(h3) || []).show()
                             $(block_of.get(h3) || []).show()
-                        } 
+                        }
                     }
                 }
             })
@@ -319,34 +319,41 @@
                     /><!--
                 --></form><!--
             --></div>
+            {% if user.is_authenticated %}
+                <div><a href="{% url 'logout' %}">Déconnexion</a></div>
+                <div><a href="{% url 'profile' %}">Profil</a></div>
+            {% else %}
+                <div><a href="{% url 'login' %}">Connexion</a></div>
+                <div><a href="{% url 'register' %}">Inscription</a></div>
+            {% endif %}
         </article>
         <div id="wrapper">
-        
+
         <article class="nav">
         <nav>
             <h3 class="nav">📙 Lecture</h3>
             <a href="#list_projects">Lister tous les projets</a>
         </nav>
-        
+
         <nav>
             <h3 class="nav">🖊️ Modification</h3>
             <a href="#create_project">Créer un projet</a>
             <a href="#import_from_filesystem">Importer un projet</a>
         </nav>
         </article>
-        
+
         <article>
         <h2>📙 Lecture</h2>
-        
+
             <h3 id="list_projects"><a href="/raw/list_projects/">Lister les projets</a></h3>
             <section>
                 <a href="/raw/list_projects/">Lister tous les projets</a>
             </section>
         </article>
-        
+
         <article>
         <h2>🖊️ Modification &ndash; Liste</h2>
-        
+
             <h3 id="create_project">Créer un projet</h3>
             <section>
                 <form action="/raw/create_project/" method="POST">
@@ -357,7 +364,7 @@
                     <p><input type="submit" />
                 </form>
             </section>
-        
+
             <h3 id="import_from_filesystem">Importer un projet</h3>
             <p class="info">If you are running sierra in local or you have ssh or scp access to the server</p>
             <section>
@@ -368,10 +375,10 @@
                 </form>
             </section>
         </article>
-        
+
         <article>
         <h2>🖊️ Modification &ndash; Projet</h2>
-        
+
             <h3>Uploader la source .tex</h3>
             <section>
                 <form action="/raw/upload_source/" method="POST" enctype="multipart/form-data">
@@ -382,7 +389,7 @@
                 </form>
             </section>
         </article>
-        
+
         <article>
         <h2>Donner des scans</h2>
             <h3>Donner des scans (upload)</h3>
@@ -391,7 +398,7 @@
                 <input name="scans" type="file" multiple="multiple" >
             </form>
         </article>
-        
+
         </div>
         <div style="margin-bottom:1000px"></div>
     </body>
